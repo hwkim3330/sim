@@ -47,6 +47,7 @@
     <!-- Libraries -->
     <script src="lib/sim-nn.js"></script>
     <script src="lib/sim-nlp.js"></script>
+    <script src="lib/sim-game.js"></script>
     <script src="lib/sim-chat.js"></script>
     <script src="lib/sim-ui.js"></script>
 
@@ -161,8 +162,16 @@
                 }
             });
 
+            // Save game state on unload
+            window.addEventListener('beforeunload', () => {
+                if (chatEngine.gameEngine) {
+                    chatEngine.gameEngine.save();
+                }
+            });
+
             console.log('심이 챗봇이 준비되었습니다!');
-            console.log('Libraries:', { SimNN, SimNLP, SimChat, SimUI });
+            console.log('Libraries:', { SimNN, SimNLP, SimGame, SimChat, SimUI });
+            console.log('Game Theory AI:', chatEngine.gameEngine ? 'Enabled' : 'Disabled');
         }
 
         init();
