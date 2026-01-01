@@ -5,12 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>심이 - AI 캐릭터 챗봇</title>
     <meta name="description" content="심이와 대화해보세요! 순수 JavaScript 신경망 기반 캐릭터 챗봇">
-    <meta name="theme-color" content="#ff6b9d">
-
-    <!-- Favicon -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💬</text></svg>">
-
-    <!-- Styles -->
     <link rel="stylesheet" href="css/main.css">
 </head>
 <body>
@@ -28,18 +23,7 @@
                     <button class="icon-btn" id="clear-chat" title="대화 지우기">🗑️</button>
                 </div>
             </div>
-
-            <div class="chat-messages" id="chat-messages">
-                <!-- Messages will be inserted here -->
-            </div>
-
-            <div class="chat-input-container">
-                <div class="chat-input-wrapper">
-                    <input type="text" id="chat-input" placeholder="심이에게 말해보세요..." autocomplete="off">
-                    <button class="voice-btn" id="voice-button" title="음성 입력">🎤</button>
-                    <button class="send-btn" id="send-button" title="전송">➤</button>
-                </div>
-            </div>
+            <div id="chat-container"></div>
         </div>
 
         <!-- Character Panel -->
@@ -58,60 +42,131 @@
                 <span class="toggle-slider"></span>
             </label>
         </div>
-        <div class="setting-row">
-            <label>효과음</label>
-            <label class="toggle">
-                <input type="checkbox" id="sound-toggle" checked>
-                <span class="toggle-slider"></span>
-            </label>
-        </div>
     </div>
 
-    <!-- Scripts -->
-    <!-- Core -->
-    <script src="src/core/tensor.js"></script>
-
-    <!-- Neural Network -->
-    <script src="src/nn/activations.js"></script>
-    <script src="src/nn/layers/dense.js"></script>
-    <script src="src/nn/layers/embedding.js"></script>
-    <script src="src/nn/layers/gru.js"></script>
-    <script src="src/nn/layers/layernorm.js"></script>
-
-    <!-- NLP -->
-    <script src="src/nlp/korean-tokenizer.js"></script>
-
-    <!-- Chat Engine -->
-    <script src="src/chat/emotion.js"></script>
-    <script src="src/chat/intent.js"></script>
-    <script src="src/chat/personality.js"></script>
-    <script src="src/chat/memory.js"></script>
-    <script src="src/chat/retriever.js"></script>
-    <script src="src/chat/responder.js"></script>
-
-    <!-- UI -->
-    <script src="src/ui/character.js"></script>
-
-    <!-- Multimodal -->
-    <script src="src/multimodal/voice.js"></script>
-
-    <!-- Main App -->
-    <script src="src/app.js"></script>
+    <!-- Libraries -->
+    <script src="lib/sim-nn.js"></script>
+    <script src="lib/sim-nlp.js"></script>
+    <script src="lib/sim-chat.js"></script>
+    <script src="lib/sim-ui.js"></script>
 
     <script>
-        // Settings panel toggle
-        document.getElementById('settings-btn')?.addEventListener('click', () => {
-            document.getElementById('settings-panel')?.classList.toggle('open');
-        });
+    (async function() {
+        'use strict';
 
-        // Close settings when clicking outside
-        document.addEventListener('click', (e) => {
-            const panel = document.getElementById('settings-panel');
-            const btn = document.getElementById('settings-btn');
-            if (panel?.classList.contains('open') && !panel.contains(e.target) && e.target !== btn) {
-                panel.classList.remove('open');
+        // Initialize components
+        const chatEngine = SimChat.create({ name: '심이' });
+        const character = new SimUI.Character('#character-container');
+        const voice = new SimUI.Voice({ enabled: true });
+
+        let chatUI;
+
+        // Handle send message
+        async function handleSend(text) {
+            chatUI.addMessage(text, 'user');
+            character.startThinking();
+
+            try {
+                const result = await chatEngine.respond(text);
+                character.stopThinking();
+                chatUI.addMessage(result.response, 'assistant', result.emoji);
+                character.react(result.emotion, result.response);
+
+                if (document.getElementById('voice-toggle').checked) {
+                    await voice.speak(result.response);
+                }
+            } catch (error) {
+                character.stopThinking();
+                chatUI.addMessage('앗, 잠깐 문제가 생겼어요...', 'assistant', '😅');
             }
-        });
+        }
+
+        // Handle voice input
+        async function handleVoice() {
+            if (!SimUI.isSTTSupported()) {
+                alert('이 브라우저에서는 음성 인식이 지원되지 않아요.');
+                return;
+            }
+
+            if (voice.isListening) {
+                voice.stopListening();
+                chatUI.setVoiceListening(false);
+                return;
+            }
+
+            try {
+                chatUI.setVoiceListening(true);
+                character.showSpeech('🎤 듣고 있어요...', 0);
+
+                const text = await voice.listen({
+                    onInterim: (interim) => chatUI.setInput(interim)
+                });
+
+                chatUI.setVoiceListening(false);
+                character.hideSpeech();
+
+                if (text) {
+                    chatUI.setInput('');
+                    handleSend(text);
+                }
+            } catch (error) {
+                chatUI.setVoiceListening(false);
+                character.hideSpeech();
+            }
+        }
+
+        // Initialize
+        async function init() {
+            // Initialize chat engine
+            await chatEngine.initialize('data/responses/responses.json');
+
+            // Create chat UI
+            chatUI = new SimUI.ChatInterface('#chat-container', {
+                placeholder: '심이에게 말해보세요...',
+                onSend: handleSend,
+                onVoice: handleVoice
+            });
+
+            // Show greeting
+            setTimeout(async () => {
+                const greeting = chatEngine.getGreeting();
+                chatUI.addMessage(greeting, 'assistant', '👋');
+                character.react('happy', greeting);
+
+                if (document.getElementById('voice-toggle').checked) {
+                    await voice.speak(greeting);
+                }
+            }, 500);
+
+            // Settings toggle
+            document.getElementById('settings-btn')?.addEventListener('click', () => {
+                document.getElementById('settings-panel')?.classList.toggle('open');
+            });
+
+            // Clear chat
+            document.getElementById('clear-chat')?.addEventListener('click', () => {
+                chatUI.clear();
+                chatEngine.clearHistory();
+                const greeting = chatEngine.getGreeting();
+                chatUI.addMessage(greeting, 'assistant', '👋');
+                character.react('happy', greeting);
+            });
+
+            // Close settings on outside click
+            document.addEventListener('click', (e) => {
+                const panel = document.getElementById('settings-panel');
+                const btn = document.getElementById('settings-btn');
+                if (panel?.classList.contains('open') && !panel.contains(e.target) && e.target !== btn) {
+                    panel.classList.remove('open');
+                }
+            });
+
+            console.log('심이 챗봇이 준비되었습니다!');
+            console.log('Libraries:', { SimNN, SimNLP, SimChat, SimUI });
+        }
+
+        init();
+    })();
     </script>
 </body>
 </html>
