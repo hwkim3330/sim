@@ -3,10 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>심이 - AI 캐릭터 챗봇</title>
-    <meta name="description" content="심이와 대화해보세요! 순수 JavaScript 신경망 기반 캐릭터 챗봇">
+    <title>Simi - AI Character Chatbot</title>
+    <meta name="description" content="Chat with Simi! Pure JavaScript neural network character chatbot">
+    <meta name="theme-color" content="#1a1a2e">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💬</text></svg>">
     <link rel="stylesheet" href="css/main.css">
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 </head>
 <body>
     <div class="app-container">
@@ -15,12 +21,13 @@
             <div class="chat-header">
                 <span class="chat-header-icon">💬</span>
                 <div class="chat-header-info">
-                    <h1>심이</h1>
-                    <p>AI 캐릭터 챗봇</p>
+                    <h1 id="app-title">Simi</h1>
+                    <p id="app-subtitle">AI Character Chatbot</p>
                 </div>
                 <div class="chat-header-actions">
-                    <button class="icon-btn" id="settings-btn" title="설정">⚙️</button>
-                    <button class="icon-btn" id="clear-chat" title="대화 지우기">🗑️</button>
+                    <button class="icon-btn" id="lang-btn" title="Language">🌐</button>
+                    <button class="icon-btn" id="settings-btn" title="Settings">⚙️</button>
+                    <button class="icon-btn" id="clear-chat" title="Clear chat">🗑️</button>
                 </div>
             </div>
             <div id="chat-container"></div>
@@ -34,20 +41,55 @@
 
     <!-- Settings Panel -->
     <div class="settings-panel" id="settings-panel">
-        <h2>⚙️ 설정</h2>
+        <h2 id="settings-title">⚙️ Settings</h2>
+
         <div class="setting-row">
-            <label>음성 출력</label>
+            <label id="label-voice">Voice Output</label>
             <label class="toggle">
                 <input type="checkbox" id="voice-toggle" checked>
                 <span class="toggle-slider"></span>
             </label>
         </div>
+
+        <div class="setting-row">
+            <label id="label-sound">Sound Effects</label>
+            <label class="toggle">
+                <input type="checkbox" id="sound-toggle" checked>
+                <span class="toggle-slider"></span>
+            </label>
+        </div>
+
+        <div class="setting-row">
+            <label id="label-haptic">Haptic Feedback</label>
+            <label class="toggle">
+                <input type="checkbox" id="haptic-toggle" checked>
+                <span class="toggle-slider"></span>
+            </label>
+        </div>
+
+        <div class="setting-row">
+            <label id="label-volume">Volume</label>
+            <input type="range" id="volume-slider" min="0" max="100" value="50" class="volume-slider">
+        </div>
+
+        <div class="setting-row setting-row-info">
+            <span id="game-stats-label">AI Learning Stats</span>
+            <span id="game-stats">-</span>
+        </div>
+    </div>
+
+    <!-- Language Selector -->
+    <div class="lang-selector" id="lang-selector">
+        <button class="lang-option" data-lang="ko">🇰🇷 한국어</button>
+        <button class="lang-option" data-lang="en">🇺🇸 English</button>
     </div>
 
     <!-- Libraries -->
     <script src="lib/sim-nn.js"></script>
     <script src="lib/sim-nlp.js"></script>
     <script src="lib/sim-game.js"></script>
+    <script src="lib/sim-i18n.js"></script>
+    <script src="lib/sim-audio.js"></script>
     <script src="lib/sim-chat.js"></script>
     <script src="lib/sim-ui.js"></script>
 
@@ -55,55 +97,115 @@
     (async function() {
         'use strict';
 
-        // Initialize components
-        const chatEngine = SimChat.create({ name: '심이' });
-        const character = new SimUI.Character('#character-container');
-        const voice = new SimUI.Voice({ enabled: true });
+        // ========================================
+        // Initialize Core Components
+        // ========================================
+        const i18n = SimI18n.instance;
+        const audio = SimAudio.create();
+        await audio.init();
 
-        let chatUI;
+        let chatEngine = null;
+        let character = null;
+        let voice = null;
+        let chatUI = null;
 
-        // Handle send message
+        // ========================================
+        // Language Change Handler
+        // ========================================
+        async function initChatEngine() {
+            const lang = i18n.getLanguage().code;
+            const responsesUrl = SimI18n.getResponseUrl(lang);
+            const characterName = i18n.getCharacterName();
+
+            chatEngine = SimChat.create({ name: characterName });
+            await chatEngine.initialize(responsesUrl);
+
+            // Update voice language
+            if (voice) {
+                voice.lang = i18n.getSpeechCode();
+            }
+
+            return chatEngine;
+        }
+
+        // ========================================
+        // Update UI Text
+        // ========================================
+        function updateUIText() {
+            const t = (key) => i18n.t(key);
+
+            document.getElementById('app-title').textContent = t('appTitle');
+            document.getElementById('app-subtitle').textContent = t('appSubtitle');
+            document.getElementById('settings-title').textContent = '⚙️ ' + t('settings');
+            document.getElementById('label-voice').textContent = t('voiceOutput');
+            document.getElementById('label-sound').textContent = t('soundEffects');
+            document.getElementById('label-haptic').textContent = t('hapticFeedback');
+            document.getElementById('label-volume').textContent = 'Volume';
+            document.getElementById('game-stats-label').textContent = 'AI Learning Stats';
+
+            // Update placeholders
+            if (chatUI) {
+                chatUI.input.placeholder = t('inputPlaceholder');
+            }
+
+            // Update document
+            document.documentElement.lang = i18n.getLanguage().code;
+            document.title = `${t('appTitle')} - ${t('appSubtitle')}`;
+        }
+
+        // ========================================
+        // Message Handlers
+        // ========================================
         async function handleSend(text) {
+            await audio.onMessageSend();
             chatUI.addMessage(text, 'user');
             character.startThinking();
 
             try {
+                await audio.play('thinking');
                 const result = await chatEngine.respond(text);
+
                 character.stopThinking();
+                await audio.onMessageReceive();
+
                 chatUI.addMessage(result.response, 'assistant', result.emoji);
                 character.react(result.emotion, result.response);
+                await audio.onReaction(result.emotion);
 
                 if (document.getElementById('voice-toggle').checked) {
                     await voice.speak(result.response);
                 }
             } catch (error) {
                 character.stopThinking();
-                chatUI.addMessage('앗, 잠깐 문제가 생겼어요...', 'assistant', '😅');
+                await audio.play('error');
+                chatUI.addMessage(i18n.t('errorGeneral'), 'assistant', '😅');
             }
         }
 
-        // Handle voice input
         async function handleVoice() {
             if (!SimUI.isSTTSupported()) {
-                alert('이 브라우저에서는 음성 인식이 지원되지 않아요.');
+                alert(i18n.t('voiceNotSupported'));
                 return;
             }
 
             if (voice.isListening) {
                 voice.stopListening();
                 chatUI.setVoiceListening(false);
+                await audio.onVoiceEnd();
                 return;
             }
 
             try {
+                await audio.onVoiceStart();
                 chatUI.setVoiceListening(true);
-                character.showSpeech('🎤 듣고 있어요...', 0);
+                character.showSpeech('🎤 ' + i18n.t('listening'), 0);
 
                 const text = await voice.listen({
                     onInterim: (interim) => chatUI.setInput(interim)
                 });
 
                 chatUI.setVoiceListening(false);
+                await audio.onVoiceEnd();
                 character.hideSpeech();
 
                 if (text) {
@@ -116,41 +218,32 @@
             }
         }
 
-        // Initialize
-        async function init() {
-            // Initialize chat engine
-            await chatEngine.initialize('data/responses/responses.json');
-
-            // Create chat UI
-            chatUI = new SimUI.ChatInterface('#chat-container', {
-                placeholder: '심이에게 말해보세요...',
-                onSend: handleSend,
-                onVoice: handleVoice
+        // ========================================
+        // Settings Handlers
+        // ========================================
+        function setupSettings() {
+            // Sound toggle
+            document.getElementById('sound-toggle').addEventListener('change', (e) => {
+                audio.setEnabled(e.target.checked);
+                if (e.target.checked) audio.play('click');
             });
 
-            // Show greeting
-            setTimeout(async () => {
-                const greeting = chatEngine.getGreeting();
-                chatUI.addMessage(greeting, 'assistant', '👋');
-                character.react('happy', greeting);
-
-                if (document.getElementById('voice-toggle').checked) {
-                    await voice.speak(greeting);
-                }
-            }, 500);
-
-            // Settings toggle
-            document.getElementById('settings-btn')?.addEventListener('click', () => {
-                document.getElementById('settings-panel')?.classList.toggle('open');
+            // Haptic toggle
+            document.getElementById('haptic-toggle').addEventListener('change', (e) => {
+                audio.setHapticsEnabled(e.target.checked);
+                if (e.target.checked) audio.haptic('tap');
             });
 
-            // Clear chat
-            document.getElementById('clear-chat')?.addEventListener('click', () => {
-                chatUI.clear();
-                chatEngine.clearHistory();
-                const greeting = chatEngine.getGreeting();
-                chatUI.addMessage(greeting, 'assistant', '👋');
-                character.react('happy', greeting);
+            // Volume slider
+            document.getElementById('volume-slider').addEventListener('input', (e) => {
+                audio.setVolume(e.target.value / 100);
+            });
+
+            // Settings button
+            document.getElementById('settings-btn').addEventListener('click', async () => {
+                await audio.play('click');
+                document.getElementById('settings-panel').classList.toggle('open');
+                updateGameStats();
             });
 
             // Close settings on outside click
@@ -162,20 +255,243 @@
                 }
             });
 
+            // Clear chat
+            document.getElementById('clear-chat').addEventListener('click', async () => {
+                await audio.play('whoosh');
+                chatUI.clear();
+                chatEngine.clearHistory();
+                showGreeting();
+            });
+        }
+
+        // ========================================
+        // Language Selector
+        // ========================================
+        function setupLanguageSelector() {
+            const langBtn = document.getElementById('lang-btn');
+            const langSelector = document.getElementById('lang-selector');
+
+            langBtn.addEventListener('click', async (e) => {
+                e.stopPropagation();
+                await audio.play('click');
+                langSelector.classList.toggle('open');
+            });
+
+            document.querySelectorAll('.lang-option').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    const lang = btn.dataset.lang;
+                    await audio.play('success');
+                    langSelector.classList.remove('open');
+
+                    if (lang !== i18n.getLanguage().code) {
+                        i18n.setLanguage(lang);
+                        updateUIText();
+
+                        // Reinitialize chat engine with new language
+                        await initChatEngine();
+                        chatUI.clear();
+                        showGreeting();
+                    }
+                });
+            });
+
+            // Close on outside click
+            document.addEventListener('click', (e) => {
+                if (!langSelector.contains(e.target) && e.target !== langBtn) {
+                    langSelector.classList.remove('open');
+                }
+            });
+        }
+
+        // ========================================
+        // Game Stats
+        // ========================================
+        function updateGameStats() {
+            if (chatEngine?.gameEngine) {
+                const stats = chatEngine.getGameStats();
+                if (stats) {
+                    document.getElementById('game-stats').textContent =
+                        `${stats.totalInteractions} interactions`;
+                }
+            }
+        }
+
+        // ========================================
+        // Greeting
+        // ========================================
+        async function showGreeting() {
+            const greeting = i18n.getGreeting();
+            chatUI.addMessage(greeting, 'assistant', '👋');
+            character.react('happy', greeting);
+
+            if (document.getElementById('voice-toggle').checked) {
+                await voice.speak(greeting);
+            }
+        }
+
+        // ========================================
+        // Notifications
+        // ========================================
+        function requestNotificationPermission() {
+            if ('Notification' in window && Notification.permission === 'default') {
+                Notification.requestPermission();
+            }
+        }
+
+        // ========================================
+        // Initialize
+        // ========================================
+        async function init() {
+            // Initialize chat engine
+            await initChatEngine();
+
+            // Create character
+            character = new SimUI.Character('#character-container');
+
+            // Create voice
+            voice = new SimUI.Voice({
+                enabled: true,
+                lang: i18n.getSpeechCode()
+            });
+
+            // Create chat UI
+            chatUI = new SimUI.ChatInterface('#chat-container', {
+                placeholder: i18n.t('inputPlaceholder'),
+                onSend: handleSend,
+                onVoice: handleVoice
+            });
+
+            // Setup
+            setupSettings();
+            setupLanguageSelector();
+            updateUIText();
+            requestNotificationPermission();
+
+            // Show greeting
+            setTimeout(async () => {
+                await audio.play('notification');
+                showGreeting();
+            }, 500);
+
             // Save game state on unload
             window.addEventListener('beforeunload', () => {
-                if (chatEngine.gameEngine) {
+                if (chatEngine?.gameEngine) {
                     chatEngine.gameEngine.save();
                 }
             });
 
-            console.log('심이 챗봇이 준비되었습니다!');
-            console.log('Libraries:', { SimNN, SimNLP, SimGame, SimChat, SimUI });
+            // Visibility change handler
+            document.addEventListener('visibilitychange', () => {
+                if (document.hidden && chatEngine?.gameEngine) {
+                    chatEngine.gameEngine.save();
+                }
+            });
+
+            // Log
+            console.log(`${i18n.t('appTitle')} initialized!`);
+            console.log('Libraries:', { SimNN, SimNLP, SimGame, SimI18n, SimAudio, SimChat, SimUI });
+            console.log('Language:', i18n.getLanguage().name);
+            console.log('Audio:', SimAudio.isSupported() ? 'Supported' : 'Not supported');
+            console.log('Haptics:', SimAudio.isHapticsSupported() ? 'Supported' : 'Not supported');
             console.log('Game Theory AI:', chatEngine.gameEngine ? 'Enabled' : 'Disabled');
         }
 
         init();
     })();
     </script>
+
+    <style>
+    /* Language Selector */
+    .lang-selector {
+        position: fixed;
+        top: 60px;
+        right: 20px;
+        background: rgba(30, 30, 50, 0.98);
+        border-radius: 12px;
+        padding: 8px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-10px);
+        transition: all 0.2s;
+        z-index: 1001;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .lang-selector.open {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+
+    .lang-option {
+        background: transparent;
+        border: none;
+        color: white;
+        padding: 10px 16px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        text-align: left;
+        transition: background 0.2s;
+    }
+
+    .lang-option:hover {
+        background: rgba(255, 107, 157, 0.3);
+    }
+
+    /* Volume Slider */
+    .volume-slider {
+        width: 100%;
+        height: 6px;
+        border-radius: 3px;
+        background: rgba(255, 255, 255, 0.1);
+        outline: none;
+        -webkit-appearance: none;
+        margin-top: 8px;
+    }
+
+    .volume-slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #ff6b9d, #c44569);
+        cursor: pointer;
+        box-shadow: 0 2px 8px rgba(255, 107, 157, 0.5);
+    }
+
+    .volume-slider::-moz-range-thumb {
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #ff6b9d, #c44569);
+        cursor: pointer;
+        border: none;
+    }
+
+    /* Settings Info Row */
+    .setting-row-info {
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 4px;
+        padding-top: 15px;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        margin-top: 10px;
+    }
+
+    .setting-row-info span:first-child {
+        font-size: 0.8rem;
+        opacity: 0.6;
+    }
+
+    .setting-row-info span:last-child {
+        font-size: 0.9rem;
+        color: #ff6b9d;
+    }
+    </style>
 </body>
 </html>
