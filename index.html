@@ -84,7 +84,10 @@
         <button class="lang-option" data-lang="en">🇺🇸 English</button>
     </div>
 
-    <!-- Libraries -->
+    <!-- Core Library (must load first) -->
+    <script src="lib/sim-core.js"></script>
+
+    <!-- Feature Libraries -->
     <script src="lib/sim-nn.js"></script>
     <script src="lib/sim-nlp.js"></script>
     <script src="lib/sim-game.js"></script>
@@ -389,7 +392,7 @@
 
             // Log
             console.log(`${i18n.t('appTitle')} initialized!`);
-            console.log('Libraries:', { SimNN, SimNLP, SimGame, SimI18n, SimAudio, SimChat, SimUI });
+            console.log('Libraries:', { SimCore, SimNN, SimNLP, SimGame, SimI18n, SimAudio, SimChat, SimUI });
             console.log('Language:', i18n.getLanguage().name);
             console.log('Audio:', SimAudio.isSupported() ? 'Supported' : 'Not supported');
             console.log('Haptics:', SimAudio.isHapticsSupported() ? 'Supported' : 'Not supported');
