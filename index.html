@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>심이 - AI 캐릭터 챗봇</title>
+    <meta name="description" content="심이와 대화해보세요! 순수 JavaScript 신경망 기반 캐릭터 챗봇">
+    <meta name="theme-color" content="#ff6b9d">
+
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💬</text></svg>">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Chat Panel -->
+        <div class="chat-panel">
+            <div class="chat-header">
+                <span class="chat-header-icon">💬</span>
+                <div class="chat-header-info">
+                    <h1>심이</h1>
+                    <p>AI 캐릭터 챗봇</p>
+                </div>
+                <div class="chat-header-actions">
+                    <button class="icon-btn" id="settings-btn" title="설정">⚙️</button>
+                    <button class="icon-btn" id="clear-chat" title="대화 지우기">🗑️</button>
+                </div>
+            </div>
+
+            <div class="chat-messages" id="chat-messages">
+                <!-- Messages will be inserted here -->
+            </div>
+
+            <div class="chat-input-container">
+                <div class="chat-input-wrapper">
+                    <input type="text" id="chat-input" placeholder="심이에게 말해보세요..." autocomplete="off">
+                    <button class="voice-btn" id="voice-button" title="음성 입력">🎤</button>
+                    <button class="send-btn" id="send-button" title="전송">➤</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Character Panel -->
+        <div class="character-panel">
+            <div id="character-container"></div>
+        </div>
+    </div>
+
+    <!-- Settings Panel -->
+    <div class="settings-panel" id="settings-panel">
+        <h2>⚙️ 설정</h2>
+        <div class="setting-row">
+            <label>음성 출력</label>
+            <label class="toggle">
+                <input type="checkbox" id="voice-toggle" checked>
+                <span class="toggle-slider"></span>
+            </label>
+        </div>
+        <div class="setting-row">
+            <label>효과음</label>
+            <label class="toggle">
+                <input type="checkbox" id="sound-toggle" checked>
+                <span class="toggle-slider"></span>
+            </label>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <!-- Core -->
+    <script src="src/core/tensor.js"></script>
+
+    <!-- Neural Network -->
+    <script src="src/nn/activations.js"></script>
+    <script src="src/nn/layers/dense.js"></script>
+    <script src="src/nn/layers/embedding.js"></script>
+    <script src="src/nn/layers/gru.js"></script>
+    <script src="src/nn/layers/layernorm.js"></script>
+
+    <!-- NLP -->
+    <script src="src/nlp/korean-tokenizer.js"></script>
+
+    <!-- Chat Engine -->
+    <script src="src/chat/emotion.js"></script>
+    <script src="src/chat/intent.js"></script>
+    <script src="src/chat/personality.js"></script>
+    <script src="src/chat/memory.js"></script>
+    <script src="src/chat/retriever.js"></script>
+    <script src="src/chat/responder.js"></script>
+
+    <!-- UI -->
+    <script src="src/ui/character.js"></script>
+
+    <!-- Multimodal -->
+    <script src="src/multimodal/voice.js"></script>
+
+    <!-- Main App -->
+    <script src="src/app.js"></script>
+
+    <script>
+        // Settings panel toggle
+        document.getElementById('settings-btn')?.addEventListener('click', () => {
+            document.getElementById('settings-panel')?.classList.toggle('open');
+        });
+
+        // Close settings when clicking outside
+        document.addEventListener('click', (e) => {
+            const panel = document.getElementById('settings-panel');
+            const btn = document.getElementById('settings-btn');
+            if (panel?.classList.contains('open') && !panel.contains(e.target) && e.target !== btn) {
+                panel.classList.remove('open');
+            }
+        });
+    </script>
+</body>
+</html>
