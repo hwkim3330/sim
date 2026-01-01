@@ -51,6 +51,13 @@
             </label>
         </div>
 
+        <div class="setting-row setting-row-select">
+            <label id="label-voice-select">Voice</label>
+            <select id="voice-select" class="setting-select">
+                <option value="">Loading...</option>
+            </select>
+        </div>
+
         <div class="setting-row">
             <label id="label-sound">Sound Effects</label>
             <label class="toggle">
@@ -141,6 +148,7 @@
             document.getElementById('app-subtitle').textContent = t('appSubtitle');
             document.getElementById('settings-title').textContent = '⚙️ ' + t('settings');
             document.getElementById('label-voice').textContent = t('voiceOutput');
+            document.getElementById('label-voice-select').textContent = t('voiceSelect');
             document.getElementById('label-sound').textContent = t('soundEffects');
             document.getElementById('label-haptic').textContent = t('hapticFeedback');
             document.getElementById('label-volume').textContent = 'Volume';
@@ -222,9 +230,52 @@
         }
 
         // ========================================
+        // Voice Selector
+        // ========================================
+        function populateVoiceSelector(voices) {
+            const select = document.getElementById('voice-select');
+            if (!select) return;
+
+            select.innerHTML = '';
+
+            if (voices.length === 0) {
+                const option = document.createElement('option');
+                option.value = '';
+                option.textContent = i18n.getLanguage().code === 'ko' ? '음성 없음' : 'No voices';
+                select.appendChild(option);
+                return;
+            }
+
+            voices.forEach(v => {
+                const option = document.createElement('option');
+                option.value = v.name;
+                // Clean up voice name for display
+                let displayName = v.name.replace('Microsoft ', '').replace(' Online (Natural)', '');
+                displayName = displayName.replace('Google ', '').replace(' (Natural)', '');
+                option.textContent = displayName;
+                select.appendChild(option);
+            });
+
+            // Set current selection
+            const currentVoice = voice?.getVoiceName();
+            if (currentVoice) {
+                select.value = currentVoice;
+            }
+        }
+
+        // ========================================
         // Settings Handlers
         // ========================================
         function setupSettings() {
+            // Voice selector
+            document.getElementById('voice-select').addEventListener('change', (e) => {
+                if (voice && e.target.value) {
+                    voice.setVoice(e.target.value);
+                    // Test the voice
+                    const testText = i18n.getLanguage().code === 'ko' ? '안녕하세요!' : 'Hello!';
+                    voice.speak(testText);
+                }
+            });
             // Sound toggle
             document.getElementById('sound-toggle').addEventListener('change', (e) => {
                 audio.setEnabled(e.target.checked);
@@ -293,6 +344,13 @@
                         // Reinitialize chat engine with new language
                         await initChatEngine();
                         chatUI.clear();
+
+                        // Update voice language and refresh selector
+                        if (voice) {
+                            voice.lang = i18n.getSpeechCode();
+                            populateVoiceSelector(voice.getVoicesForLanguage());
+                        }
+
                         showGreeting();
                     }
                 });
@@ -351,10 +409,11 @@
             // Create character
             character = new SimUI.Character('#character-container');
 
-            // Create voice
+            // Create voice with callback to populate selector
             voice = new SimUI.Voice({
                 enabled: true,
-                lang: i18n.getSpeechCode()
+                lang: i18n.getSpeechCode(),
+                onVoicesLoaded: (voices) => populateVoiceSelector(voices)
             });
 
             // Create chat UI
@@ -494,6 +553,43 @@
     .setting-row-info span:last-child {
         font-size: 0.9rem;
         color: #ff6b9d;
+    }
+
+    /* Voice Select */
+    .setting-row-select {
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 8px;
+    }
+
+    .setting-select {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        font-size: 0.9rem;
+        cursor: pointer;
+        outline: none;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='white' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+    }
+
+    .setting-select:hover {
+        border-color: rgba(255, 107, 157, 0.5);
+    }
+
+    .setting-select:focus {
+        border-color: #ff6b9d;
+    }
+
+    .setting-select option {
+        background: #1a1a2e;
+        color: white;
+        padding: 8px;
     }
     </style>
 </body>
