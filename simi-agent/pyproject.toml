@@ -1,0 +1,83 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "simi-agent"
+version = "1.0.0"
+description = "Hybrid AI coding agent with local VLM and Claude API fallback"
+readme = "README.md"
+license = "MIT"
+authors = [
+    { name = "Simi Team", email = "simi@example.com" }
+]
+keywords = [
+    "ai", "agent", "llm", "vlm", "openvino", "claude", "coding-assistant"
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+requires-python = ">=3.10"
+dependencies = [
+    "anthropic>=0.40.0",
+    "openvino>=2024.0.0",
+    "openvino-genai>=2024.0.0",
+    "pillow>=10.0.0",
+    "httpx>=0.27.0",
+    "rich>=13.0.0",
+    "pydantic>=2.0.0",
+    "click>=8.0.0",
+    "prompt-toolkit>=3.0.0",
+    "tiktoken>=0.5.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-cov>=4.0.0",
+    "ruff>=0.1.0",
+    "mypy>=1.0.0",
+    "black>=23.0.0",
+]
+all = [
+    "transformers>=4.40.0",
+    "optimum[openvino]>=1.18.0",
+    "torch>=2.0.0",
+]
+
+[project.scripts]
+simi = "simi.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/simi-agent/simi"
+Documentation = "https://simi-agent.github.io"
+Repository = "https://github.com/simi-agent/simi"
+
+[tool.hatch.build.targets.wheel]
+packages = ["simi"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "UP", "B", "C4", "SIM"]
+ignore = ["E501"]
+
+[tool.mypy]
+python_version = "3.10"
+strict = true
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
