@@ -2,17 +2,22 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Simi - AI Character Chatbot</title>
     <meta name="description" content="Chat with Simi! Pure JavaScript neural network character chatbot">
-    <meta name="theme-color" content="#1a1a2e">
+    <meta name="theme-color" content="#0a0a0f">
+    <meta name="color-scheme" content="dark">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💬</text></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="css/main.css">
 
     <!-- PWA Manifest -->
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Simi">
+    <meta name="mobile-web-app-capable" content="yes">
 </head>
 <body>
     <div class="app-container">
@@ -461,136 +466,5 @@
         init();
     })();
     </script>
-
-    <style>
-    /* Language Selector */
-    .lang-selector {
-        position: fixed;
-        top: 60px;
-        right: 20px;
-        background: rgba(30, 30, 50, 0.98);
-        border-radius: 12px;
-        padding: 8px;
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-        opacity: 0;
-        visibility: hidden;
-        transform: translateY(-10px);
-        transition: all 0.2s;
-        z-index: 1001;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    .lang-selector.open {
-        opacity: 1;
-        visibility: visible;
-        transform: translateY(0);
-    }
-
-    .lang-option {
-        background: transparent;
-        border: none;
-        color: white;
-        padding: 10px 16px;
-        border-radius: 8px;
-        cursor: pointer;
-        font-size: 0.9rem;
-        text-align: left;
-        transition: background 0.2s;
-    }
-
-    .lang-option:hover {
-        background: rgba(255, 107, 157, 0.3);
-    }
-
-    /* Volume Slider */
-    .volume-slider {
-        width: 100%;
-        height: 6px;
-        border-radius: 3px;
-        background: rgba(255, 255, 255, 0.1);
-        outline: none;
-        -webkit-appearance: none;
-        margin-top: 8px;
-    }
-
-    .volume-slider::-webkit-slider-thumb {
-        -webkit-appearance: none;
-        width: 18px;
-        height: 18px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, #ff6b9d, #c44569);
-        cursor: pointer;
-        box-shadow: 0 2px 8px rgba(255, 107, 157, 0.5);
-    }
-
-    .volume-slider::-moz-range-thumb {
-        width: 18px;
-        height: 18px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, #ff6b9d, #c44569);
-        cursor: pointer;
-        border: none;
-    }
-
-    /* Settings Info Row */
-    .setting-row-info {
-        flex-direction: column;
-        align-items: flex-start !important;
-        gap: 4px;
-        padding-top: 15px;
-        border-top: 1px solid rgba(255, 255, 255, 0.1);
-        margin-top: 10px;
-    }
-
-    .setting-row-info span:first-child {
-        font-size: 0.8rem;
-        opacity: 0.6;
-    }
-
-    .setting-row-info span:last-child {
-        font-size: 0.9rem;
-        color: #ff6b9d;
-    }
-
-    /* Voice Select */
-    .setting-row-select {
-        flex-direction: column;
-        align-items: flex-start !important;
-        gap: 8px;
-    }
-
-    .setting-select {
-        width: 100%;
-        padding: 10px 12px;
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        border-radius: 8px;
-        background: rgba(255, 255, 255, 0.1);
-        color: white;
-        font-size: 0.9rem;
-        cursor: pointer;
-        outline: none;
-        appearance: none;
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='white' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
-        background-repeat: no-repeat;
-        background-position: right 12px center;
-    }
-
-    .setting-select:hover {
-        border-color: rgba(255, 107, 157, 0.5);
-    }
-
-    .setting-select:focus {
-        border-color: #ff6b9d;
-    }
-
-    .setting-select option {
-        background: #1a1a2e;
-        color: white;
-        padding: 8px;
-    }
-    </style>
 </body>
 </html>

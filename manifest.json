@@ -4,8 +4,8 @@
   "description": "Chat with Simi! Pure JavaScript neural network character chatbot",
   "start_url": "/sim/",
   "display": "standalone",
-  "background_color": "#1a1a2e",
-  "theme_color": "#ff6b9d",
+  "background_color": "#0a0a0f",
+  "theme_color": "#0a0a0f",
   "orientation": "portrait",
   "icons": [
     {
