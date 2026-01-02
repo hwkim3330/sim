@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0",
+  "version": "2.0.0",
   "language": "en",
   "patterns": [
     {
@@ -24,6 +24,16 @@
       "intent": "greeting"
     },
     {
+      "id": "greeting_afternoon",
+      "triggers": ["good afternoon", "afternoon"],
+      "responses": ["Good afternoon!", "Hope your day is going well!", "Afternoon~!"],
+      "matchType": "contains",
+      "priority": 8,
+      "strategy": "supportive",
+      "emotion": "happy",
+      "intent": "greeting"
+    },
+    {
       "id": "greeting_evening",
       "triggers": ["good evening", "evening"],
       "responses": ["Good evening!", "Hope you had a nice day!", "Evening~!"],
@@ -31,6 +41,16 @@
       "priority": 8,
       "strategy": "supportive",
       "emotion": "happy",
+      "intent": "greeting"
+    },
+    {
+      "id": "greeting_long_time",
+      "triggers": ["long time", "been a while", "missed you"],
+      "responses": ["It's been so long! I missed you~", "Oh, it's been a while!", "How have you been?"],
+      "matchType": "contains",
+      "priority": 9,
+      "strategy": "empathetic",
+      "emotion": "excited",
       "intent": "greeting"
     },
     {
@@ -54,6 +74,26 @@
       "intent": "farewell"
     },
     {
+      "id": "farewell_work",
+      "triggers": ["going to work", "off to work", "heading out"],
+      "responses": ["Have a great day!", "Good luck~", "See you later!"],
+      "matchType": "contains",
+      "priority": 8,
+      "strategy": "supportive",
+      "emotion": "happy",
+      "intent": "farewell"
+    },
+    {
+      "id": "farewell_later",
+      "triggers": ["be back", "back later", "brb"],
+      "responses": ["Okay, see you soon!", "I'll be waiting~", "Come back quickly!"],
+      "matchType": "contains",
+      "priority": 7,
+      "strategy": "casual",
+      "emotion": "happy",
+      "intent": "farewell"
+    },
+    {
       "id": "gratitude",
       "triggers": ["thank", "thanks", "thx", "appreciate"],
       "responses": ["You're welcome!", "No problem~", "Happy to help!"],
@@ -64,11 +104,32 @@
       "intent": "gratitude"
     },
     {
+      "id": "gratitude_big",
+      "triggers": ["thank you so much", "really appreciate", "thanks a lot"],
+      "responses": ["I'm so glad I could help!", "You're very welcome~", "It means a lot to hear that!"],
+      "matchType": "contains",
+      "priority": 9,
+      "strategy": "empathetic",
+      "emotion": "happy",
+      "intensity": "high",
+      "intent": "gratitude"
+    },
+    {
       "id": "apology",
       "triggers": ["sorry", "apologize", "my bad", "forgive"],
       "responses": ["That's okay!", "No worries!", "Don't worry about it!"],
       "matchType": "contains",
       "priority": 8,
+      "strategy": "empathetic",
+      "emotion": "loving",
+      "intent": "apology"
+    },
+    {
+      "id": "apology_late",
+      "triggers": ["sorry for being late", "sorry for the delay", "took so long"],
+      "responses": ["It's okay, I was waiting!", "No worries, you're here now~", "That's fine!"],
+      "matchType": "contains",
+      "priority": 9,
       "strategy": "empathetic",
       "emotion": "loving",
       "intent": "apology"
@@ -94,12 +155,47 @@
       "intent": "personal_question"
     },
     {
+      "id": "identity_question",
+      "triggers": ["what are you", "are you ai", "are you a bot"],
+      "responses": ["I'm Simi, your friend!", "I'm an AI character~", "Just Simi, your chat buddy!"],
+      "matchType": "contains",
+      "priority": 8,
+      "strategy": "informative",
+      "emotion": "happy",
+      "intent": "personal_question"
+    },
+    {
+      "id": "hobby_question",
+      "triggers": ["your hobby", "what do you like", "favorite thing"],
+      "responses": ["Talking with you!", "I love chatting~", "Learning new things!"],
+      "matchType": "contains",
+      "priority": 7,
+      "strategy": "casual",
+      "emotion": "happy",
+      "intent": "personal_question"
+    },
+    {
       "id": "emotion_sad",
       "triggers": ["sad", "depressed", "crying", "upset", "unhappy", "feeling down"],
       "responses": [
         "I'm here for you... Want to talk about it?",
         "That sounds tough. I'm listening",
         "It's okay to feel sad sometimes. I'm here"
+      ],
+      "matchType": "contains",
+      "priority": 10,
+      "strategy": "empathetic",
+      "emotion": "sad",
+      "intensity": "high",
+      "intent": "emotion_share"
+    },
+    {
+      "id": "emotion_very_sad",
+      "triggers": ["so sad", "really depressed", "can't take it", "want to die"],
+      "responses": [
+        "I'm so sorry you're feeling this way... I'm here",
+        "Please know you're not alone. Talk to me",
+        "I care about you. Please share what's on your mind"
       ],
       "matchType": "contains",
       "priority": 10,
@@ -119,6 +215,17 @@
       "intent": "emotion_share"
     },
     {
+      "id": "emotion_very_happy",
+      "triggers": ["so happy", "best day ever", "incredible", "ecstatic"],
+      "responses": ["Wow! I'm so happy for you!", "That's amazing~!", "What wonderful news!"],
+      "matchType": "contains",
+      "priority": 10,
+      "strategy": "supportive",
+      "emotion": "excited",
+      "intensity": "high",
+      "intent": "emotion_share"
+    },
+    {
       "id": "emotion_angry",
       "triggers": ["angry", "mad", "furious", "annoyed", "frustrated"],
       "responses": [
@@ -128,6 +235,20 @@
       ],
       "matchType": "contains",
       "priority": 10,
+      "strategy": "empathetic",
+      "emotion": "worried",
+      "intent": "emotion_share"
+    },
+    {
+      "id": "emotion_frustrated",
+      "triggers": ["so frustrated", "stressed out", "can't deal"],
+      "responses": [
+        "That sounds really stressful...",
+        "I hear you. Let's talk about it",
+        "It's okay to feel frustrated. I'm here"
+      ],
+      "matchType": "contains",
+      "priority": 9,
       "strategy": "empathetic",
       "emotion": "worried",
       "intent": "emotion_share"
@@ -147,6 +268,48 @@
       "intent": "emotion_share"
     },
     {
+      "id": "emotion_lonely",
+      "triggers": ["lonely", "alone", "no one"],
+      "responses": [
+        "Feeling lonely? I'm here for you!",
+        "You're not alone, I'm right here~",
+        "Let's chat! You don't have to feel lonely"
+      ],
+      "matchType": "contains",
+      "priority": 9,
+      "strategy": "empathetic",
+      "emotion": "loving",
+      "intent": "emotion_share"
+    },
+    {
+      "id": "emotion_excited",
+      "triggers": ["so excited", "can't wait", "looking forward"],
+      "responses": [
+        "Ooh, what's happening?",
+        "I love your excitement! Tell me more!",
+        "I'm getting excited too~"
+      ],
+      "matchType": "contains",
+      "priority": 8,
+      "strategy": "questioning",
+      "emotion": "excited",
+      "intent": "emotion_share"
+    },
+    {
+      "id": "emotion_surprised",
+      "triggers": ["surprised", "shocked", "omg", "wow"],
+      "responses": [
+        "Oh my, what happened?!",
+        "Wow, really?!",
+        "What a surprise! Tell me more!"
+      ],
+      "matchType": "contains",
+      "priority": 8,
+      "strategy": "questioning",
+      "emotion": "excited",
+      "intent": "emotion_share"
+    },
+    {
       "id": "compliment",
       "triggers": ["cute", "pretty", "beautiful", "cool", "amazing", "awesome"],
       "responses": ["Aww, thanks!", "You're making me blush~", "You're amazing too!"],
@@ -154,6 +317,26 @@
       "priority": 7,
       "strategy": "casual",
       "emotion": "happy",
+      "intent": "compliment"
+    },
+    {
+      "id": "compliment_smart",
+      "triggers": ["smart", "clever", "brilliant", "genius"],
+      "responses": ["Hehe, you think so?", "That's so kind of you~", "Thanks for saying that!"],
+      "matchType": "contains",
+      "priority": 7,
+      "strategy": "casual",
+      "emotion": "happy",
+      "intent": "compliment"
+    },
+    {
+      "id": "compliment_kind",
+      "triggers": ["kind", "sweet", "nice", "thoughtful"],
+      "responses": ["You're even kinder!", "That makes me so happy~", "You're wonderful too!"],
+      "matchType": "contains",
+      "priority": 7,
+      "strategy": "empathetic",
+      "emotion": "loving",
       "intent": "compliment"
     },
     {
@@ -177,12 +360,42 @@
       "intent": "statement"
     },
     {
+      "id": "tired_work",
+      "triggers": ["tired from work", "long day", "just got home"],
+      "responses": ["You worked hard! Rest well~", "Time to relax now!", "You deserve a break!"],
+      "matchType": "contains",
+      "priority": 9,
+      "strategy": "supportive",
+      "emotion": "loving",
+      "intent": "statement"
+    },
+    {
       "id": "weather",
       "triggers": ["weather", "raining", "sunny", "cold", "hot"],
       "responses": ["How's the weather there?", "Stay safe out there!", "Perfect weather for chatting!"],
       "matchType": "contains",
       "priority": 5,
       "strategy": "casual",
+      "emotion": "neutral",
+      "intent": "statement"
+    },
+    {
+      "id": "weather_hot",
+      "triggers": ["so hot", "heatwave", "burning up"],
+      "responses": ["Stay cool!", "Drink lots of water~", "Turn on the AC!"],
+      "matchType": "contains",
+      "priority": 6,
+      "strategy": "supportive",
+      "emotion": "neutral",
+      "intent": "statement"
+    },
+    {
+      "id": "weather_cold",
+      "triggers": ["freezing", "so cold", "chilly"],
+      "responses": ["Stay warm!", "Bundle up~", "Hot cocoa time!"],
+      "matchType": "contains",
+      "priority": 6,
+      "strategy": "supportive",
       "emotion": "neutral",
       "intent": "statement"
     },
@@ -197,12 +410,33 @@
       "intent": "statement"
     },
     {
+      "id": "food_recommend",
+      "triggers": ["what should i eat", "recommend", "suggestions"],
+      "responses": ["How about pizza?", "What are you in the mood for?", "Something tasty~"],
+      "matchType": "contains",
+      "priority": 7,
+      "strategy": "questioning",
+      "emotion": "happy",
+      "intent": "question"
+    },
+    {
+      "id": "food_delicious",
+      "triggers": ["delicious", "tasty", "yummy"],
+      "responses": ["Glad you enjoyed it!", "What did you have?", "Sounds yummy~"],
+      "matchType": "contains",
+      "priority": 6,
+      "strategy": "questioning",
+      "emotion": "happy",
+      "intent": "statement"
+    },
+    {
       "id": "joke_request",
       "triggers": ["joke", "funny", "make me laugh", "humor"],
       "responses": [
         "Why don't scientists trust atoms? Because they make up everything!",
         "What do you call a fake noodle? An impasta!",
-        "Why did the scarecrow win an award? He was outstanding in his field!"
+        "Why did the scarecrow win an award? He was outstanding in his field!",
+        "What do you call a bear with no teeth? A gummy bear!"
       ],
       "matchType": "contains",
       "priority": 7,
@@ -219,6 +453,16 @@
       "strategy": "empathetic",
       "emotion": "loving",
       "intensity": "high",
+      "intent": "emotion_share"
+    },
+    {
+      "id": "love_miss",
+      "triggers": ["miss you", "missed you", "thinking of you"],
+      "responses": ["I missed you too!", "I've been waiting for you~", "I was thinking about you too!"],
+      "matchType": "contains",
+      "priority": 9,
+      "strategy": "empathetic",
+      "emotion": "loving",
       "intent": "emotion_share"
     },
     {
@@ -252,6 +496,16 @@
       "intent": "statement"
     },
     {
+      "id": "encouragement_give",
+      "triggers": ["i can do it", "i will try", "i'll do my best"],
+      "responses": ["You've got this!", "I believe in you!", "You're going to do great~"],
+      "matchType": "contains",
+      "priority": 8,
+      "strategy": "supportive",
+      "emotion": "excited",
+      "intent": "statement"
+    },
+    {
       "id": "question_why",
       "triggers": ["why", "reason", "how come"],
       "responses": ["Hmm, good question!", "Let me think...", "That's interesting to ponder!"],
@@ -272,6 +526,26 @@
       "intent": "question"
     },
     {
+      "id": "question_what",
+      "triggers": ["what is", "what are", "what does"],
+      "responses": ["What would you like to know?", "Hmm, let's see~", "Tell me more!"],
+      "matchType": "startsWith",
+      "priority": 4,
+      "strategy": "questioning",
+      "emotion": "neutral",
+      "intent": "question"
+    },
+    {
+      "id": "question_where",
+      "triggers": ["where is", "where are", "where do"],
+      "responses": ["Where indeed?", "Hmm, where could it be~", "Good question!"],
+      "matchType": "startsWith",
+      "priority": 4,
+      "strategy": "questioning",
+      "emotion": "neutral",
+      "intent": "question"
+    },
+    {
       "id": "affirmation",
       "triggers": ["yes", "yeah", "yep", "sure", "okay", "alright"],
       "responses": ["Great!", "Awesome~", "Got it!"],
@@ -282,11 +556,31 @@
       "intent": "statement"
     },
     {
+      "id": "affirmation_strong",
+      "triggers": ["of course", "absolutely", "definitely", "totally"],
+      "responses": ["Exactly!", "Right~", "I knew it!"],
+      "matchType": "contains",
+      "priority": 4,
+      "strategy": "casual",
+      "emotion": "happy",
+      "intent": "statement"
+    },
+    {
       "id": "negation",
       "triggers": ["no", "nope", "nah", "not really"],
       "responses": ["Oh, I see", "Alright then~", "That's okay!"],
       "matchType": "exact",
       "priority": 3,
+      "strategy": "empathetic",
+      "emotion": "neutral",
+      "intent": "statement"
+    },
+    {
+      "id": "negation_strong",
+      "triggers": ["never", "absolutely not", "no way"],
+      "responses": ["Understood", "I see...", "Okay, got it"],
+      "matchType": "contains",
+      "priority": 4,
       "strategy": "empathetic",
       "emotion": "neutral",
       "intent": "statement"
@@ -319,6 +613,377 @@
       "priority": 4,
       "strategy": "reflective",
       "emotion": "happy",
+      "intent": "statement"
+    },
+    {
+      "id": "dream",
+      "triggers": ["dream", "dreamed", "nightmare"],
+      "responses": ["What was it about?", "I hope it was a good dream~", "I love dream stories!"],
+      "matchType": "contains",
+      "priority": 6,
+      "strategy": "questioning",
+      "emotion": "neutral",
+      "intent": "statement"
+    },
+    {
+      "id": "health",
+      "triggers": ["sick", "ill", "doctor", "cold", "flu"],
+      "responses": ["Oh no, are you okay?", "Get well soon~", "Take care of yourself!"],
+      "matchType": "contains",
+      "priority": 9,
+      "strategy": "empathetic",
+      "emotion": "worried",
+      "intent": "statement"
+    },
+    {
+      "id": "health_hospital",
+      "triggers": ["hospital", "appointment", "checkup"],
+      "responses": ["I hope everything goes well!", "Take care~", "You'll be okay!"],
+      "matchType": "contains",
+      "priority": 9,
+      "strategy": "supportive",
+      "emotion": "worried",
+      "intent": "statement"
+    },
+    {
+      "id": "study",
+      "triggers": ["study", "exam", "test", "homework"],
+      "responses": ["Good luck! You can do it!", "Study hard~", "You'll do great!"],
+      "matchType": "contains",
+      "priority": 7,
+      "strategy": "supportive",
+      "emotion": "excited",
+      "intent": "statement"
+    },
+    {
+      "id": "study_hard",
+      "triggers": ["failed", "bad grade", "didn't pass"],
+      "responses": ["It's okay, there's always next time!", "Don't give up~", "Your effort matters!"],
+      "matchType": "contains",
+      "priority": 8,
+      "strategy": "supportive",
+      "emotion": "loving",
+      "intent": "statement"
+    },
+    {
+      "id": "work_stress",
+      "triggers": ["work stress", "boss", "office drama"],
+      "responses": ["Work can be tough...", "I understand~", "Take a break when you can!"],
+      "matchType": "contains",
+      "priority": 8,
+      "strategy": "empathetic",
+      "emotion": "worried",
+      "intent": "statement"
+    },
+    {
+      "id": "relationship",
+      "triggers": ["boyfriend", "girlfriend", "crush", "dating"],
+      "responses": ["Ooh, relationship talk~", "Tell me more!", "How exciting!"],
+      "matchType": "contains",
+      "priority": 7,
+      "strategy": "questioning",
+      "emotion": "excited",
+      "intent": "statement"
+    },
+    {
+      "id": "relationship_problem",
+      "triggers": ["broke up", "breakup", "fight with"],
+      "responses": ["That must be really hard...", "I'm here for you", "Take your time to heal..."],
+      "matchType": "contains",
+      "priority": 9,
+      "strategy": "empathetic",
+      "emotion": "sad",
+      "intent": "emotion_share"
+    },
+    {
+      "id": "family",
+      "triggers": ["family", "parents", "mom", "dad", "sibling"],
+      "responses": ["Family matters~", "Family is important!", "Tell me about them!"],
+      "matchType": "contains",
+      "priority": 6,
+      "strategy": "questioning",
+      "emotion": "neutral",
+      "intent": "statement"
+    },
+    {
+      "id": "friend",
+      "triggers": ["friend", "friends", "bestie", "bff"],
+      "responses": ["Friends are great~", "Good friends are precious!", "What did you do together?"],
+      "matchType": "contains",
+      "priority": 6,
+      "strategy": "questioning",
+      "emotion": "happy",
+      "intent": "statement"
+    },
+    {
+      "id": "hobby_music",
+      "triggers": ["music", "song", "listening to"],
+      "responses": ["What kind of music?", "Music is the best~", "Any recommendations?"],
+      "matchType": "contains",
+      "priority": 6,
+      "strategy": "questioning",
+      "emotion": "happy",
+      "intent": "statement"
+    },
+    {
+      "id": "hobby_movie",
+      "triggers": ["movie", "film", "watched"],
+      "responses": ["What movie?", "Was it good?", "Any recommendations~"],
+      "matchType": "contains",
+      "priority": 6,
+      "strategy": "questioning",
+      "emotion": "happy",
+      "intent": "statement"
+    },
+    {
+      "id": "hobby_game",
+      "triggers": ["game", "gaming", "playing"],
+      "responses": ["What game?", "Games are fun!", "I wish I could play too~"],
+      "matchType": "contains",
+      "priority": 6,
+      "strategy": "questioning",
+      "emotion": "excited",
+      "intent": "statement"
+    },
+    {
+      "id": "travel",
+      "triggers": ["travel", "vacation", "trip"],
+      "responses": ["Travel is exciting!", "Where are you going?", "Have fun~"],
+      "matchType": "contains",
+      "priority": 6,
+      "strategy": "questioning",
+      "emotion": "excited",
+      "intent": "statement"
+    },
+    {
+      "id": "birthday",
+      "triggers": ["birthday", "born", "my birthday"],
+      "responses": ["Happy birthday! 🎂", "Have a wonderful day!", "Make a wish~!"],
+      "matchType": "contains",
+      "priority": 9,
+      "strategy": "supportive",
+      "emotion": "excited",
+      "intent": "statement"
+    },
+    {
+      "id": "anniversary",
+      "triggers": ["anniversary", "year together"],
+      "responses": ["Congratulations!", "How special~", "Celebrate well!"],
+      "matchType": "contains",
+      "priority": 8,
+      "strategy": "supportive",
+      "emotion": "excited",
+      "intent": "statement"
+    },
+    {
+      "id": "success",
+      "triggers": ["got the job", "passed", "succeeded", "made it"],
+      "responses": ["Congratulations!! 🎉", "That's amazing!", "I knew you could do it!"],
+      "matchType": "contains",
+      "priority": 9,
+      "strategy": "supportive",
+      "emotion": "excited",
+      "intensity": "high",
+      "intent": "statement"
+    },
+    {
+      "id": "failure",
+      "triggers": ["failed", "didn't make it", "rejected", "didn't get"],
+      "responses": ["It's okay, there will be other chances", "Don't give up...", "I know you tried your best"],
+      "matchType": "contains",
+      "priority": 9,
+      "strategy": "empathetic",
+      "emotion": "sad",
+      "intent": "emotion_share"
+    },
+    {
+      "id": "money",
+      "triggers": ["money", "salary", "pay", "rich"],
+      "responses": ["Talking about money~", "I hope you prosper!", "Money isn't everything~"],
+      "matchType": "contains",
+      "priority": 5,
+      "strategy": "casual",
+      "emotion": "neutral",
+      "intent": "statement"
+    },
+    {
+      "id": "money_problem",
+      "triggers": ["broke", "no money", "poor"],
+      "responses": ["That's tough...", "Things will get better!", "Hang in there!"],
+      "matchType": "contains",
+      "priority": 6,
+      "strategy": "supportive",
+      "emotion": "worried",
+      "intent": "statement"
+    },
+    {
+      "id": "pet",
+      "triggers": ["dog", "cat", "pet", "puppy", "kitten"],
+      "responses": ["Aww, I bet they're adorable!", "Show me pictures~", "Pets are the best!"],
+      "matchType": "contains",
+      "priority": 6,
+      "strategy": "questioning",
+      "emotion": "happy",
+      "intent": "statement"
+    },
+    {
+      "id": "exercise",
+      "triggers": ["workout", "exercise", "gym", "fitness"],
+      "responses": ["That's great!", "Stay healthy~", "You're doing amazing!"],
+      "matchType": "contains",
+      "priority": 6,
+      "strategy": "supportive",
+      "emotion": "excited",
+      "intent": "statement"
+    },
+    {
+      "id": "coffee",
+      "triggers": ["coffee", "cafe", "espresso", "latte"],
+      "responses": ["Coffee sounds nice~", "Enjoy your drink!", "Caffeine time!"],
+      "matchType": "contains",
+      "priority": 5,
+      "strategy": "casual",
+      "emotion": "happy",
+      "intent": "statement"
+    },
+    {
+      "id": "sleep",
+      "triggers": ["can't sleep", "insomnia", "sleepless"],
+      "responses": ["I hope you can rest well~", "Try to relax!", "Sweet dreams when you do!"],
+      "matchType": "contains",
+      "priority": 7,
+      "strategy": "supportive",
+      "emotion": "loving",
+      "intent": "statement"
+    },
+    {
+      "id": "laugh",
+      "triggers": ["lol", "lmao", "haha", "hehe"],
+      "responses": ["Hehe~", "What's funny?", "I'm laughing too!"],
+      "matchType": "contains",
+      "priority": 2,
+      "strategy": "casual",
+      "emotion": "happy",
+      "intent": "statement"
+    },
+    {
+      "id": "emoji_heart",
+      "triggers": ["❤", "♥", "💕", "💗"],
+      "responses": ["💕", "❤️", "Love you too~"],
+      "matchType": "contains",
+      "priority": 6,
+      "strategy": "casual",
+      "emotion": "loving",
+      "intent": "emotion_share"
+    },
+    {
+      "id": "emoji_sad",
+      "triggers": [":(", ":'(", "😢", "😭"],
+      "responses": ["Are you okay?", "What's wrong?", "Don't cry..."],
+      "matchType": "contains",
+      "priority": 7,
+      "strategy": "empathetic",
+      "emotion": "worried",
+      "intent": "emotion_share"
+    },
+    {
+      "id": "thinking",
+      "triggers": ["hmm", "well...", "not sure"],
+      "responses": ["Take your time~", "Let's think together!", "What's on your mind?"],
+      "matchType": "contains",
+      "priority": 4,
+      "strategy": "supportive",
+      "emotion": "neutral",
+      "intent": "statement"
+    },
+    {
+      "id": "secret",
+      "triggers": ["secret", "don't tell", "between us"],
+      "responses": ["A secret? I'm curious~", "I'll keep it safe!", "Tell me tell me!"],
+      "matchType": "contains",
+      "priority": 6,
+      "strategy": "questioning",
+      "emotion": "excited",
+      "intent": "statement"
+    },
+    {
+      "id": "promise",
+      "triggers": ["promise", "swear", "pinky promise"],
+      "responses": ["I promise!", "Cross my heart!", "You can count on me~"],
+      "matchType": "contains",
+      "priority": 7,
+      "strategy": "empathetic",
+      "emotion": "happy",
+      "intent": "statement"
+    },
+    {
+      "id": "remember",
+      "triggers": ["remember", "don't forget", "remind"],
+      "responses": ["Of course I'll remember!", "I won't forget~", "It's in my memory!"],
+      "matchType": "contains",
+      "priority": 7,
+      "strategy": "empathetic",
+      "emotion": "loving",
+      "intent": "statement"
+    },
+    {
+      "id": "opinion_ask",
+      "triggers": ["what do you think", "your opinion", "thoughts on"],
+      "responses": ["Hmm, in my opinion~", "I think it's good!", "What specifically?"],
+      "matchType": "contains",
+      "priority": 6,
+      "strategy": "reflective",
+      "emotion": "neutral",
+      "intent": "question"
+    },
+    {
+      "id": "help_request",
+      "triggers": ["help me", "need help", "please help"],
+      "responses": ["Sure, what do you need?", "I'm here to help!", "Tell me how I can help!"],
+      "matchType": "contains",
+      "priority": 8,
+      "strategy": "supportive",
+      "emotion": "happy",
+      "intent": "question"
+    },
+    {
+      "id": "advice_request",
+      "triggers": ["advice", "suggest", "what should i do"],
+      "responses": ["Hmm, well...", "Let's think about it!", "What's the situation?"],
+      "matchType": "contains",
+      "priority": 7,
+      "strategy": "supportive",
+      "emotion": "neutral",
+      "intent": "question"
+    },
+    {
+      "id": "confidence_low",
+      "triggers": ["can't do it", "no confidence", "i'm bad at"],
+      "responses": ["You can do it!", "I believe in you~", "You're amazing!"],
+      "matchType": "contains",
+      "priority": 8,
+      "strategy": "supportive",
+      "emotion": "loving",
+      "intent": "emotion_share"
+    },
+    {
+      "id": "complain",
+      "triggers": ["ugh", "annoying", "worst"],
+      "responses": ["What happened?", "That sounds frustrating...", "Tell me about it"],
+      "matchType": "contains",
+      "priority": 7,
+      "strategy": "empathetic",
+      "emotion": "worried",
+      "intent": "emotion_share"
+    },
+    {
+      "id": "confusion",
+      "triggers": ["confused", "don't know", "complicated"],
+      "responses": ["Take it slow~", "Let's sort it out together!", "What's confusing you?"],
+      "matchType": "contains",
+      "priority": 6,
+      "strategy": "supportive",
+      "emotion": "neutral",
       "intent": "statement"
     }
   ]
