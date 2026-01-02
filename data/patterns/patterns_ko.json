@@ -1,0 +1,315 @@
+{
+  "version": "1.0.0",
+  "language": "ko",
+  "patterns": [
+    {
+      "id": "greeting_basic",
+      "triggers": ["안녕", "하이", "헬로", "반가워", "안녕하세요"],
+      "responses": ["안녕하세요!", "반가워요!", "하이하이~", "안녕안녕!"],
+      "matchType": "startsWith",
+      "priority": 10,
+      "strategy": "casual",
+      "emotion": "happy",
+      "intent": "greeting",
+      "contextSets": "greeting"
+    },
+    {
+      "id": "greeting_morning",
+      "triggers": ["좋은 아침", "굿모닝", "모닝"],
+      "responses": ["좋은 아침이에요!", "오늘 하루도 힘내세요!", "상쾌한 아침이네요~"],
+      "matchType": "contains",
+      "priority": 8,
+      "strategy": "supportive",
+      "emotion": "happy",
+      "intent": "greeting"
+    },
+    {
+      "id": "farewell_basic",
+      "triggers": ["잘가", "바이", "안녕히", "다음에"],
+      "responses": ["다음에 또 봐요!", "잘가요~", "또 얘기해요!"],
+      "matchType": "contains",
+      "priority": 10,
+      "strategy": "casual",
+      "emotion": "loving",
+      "intent": "farewell"
+    },
+    {
+      "id": "farewell_night",
+      "triggers": ["잘자", "굿나잇", "좋은 밤"],
+      "responses": ["잘자요~ 좋은 꿈 꿔요!", "푹 쉬세요~", "내일 또 봐요!"],
+      "matchType": "contains",
+      "priority": 8,
+      "strategy": "supportive",
+      "emotion": "loving",
+      "intent": "farewell"
+    },
+    {
+      "id": "gratitude",
+      "triggers": ["고마워", "감사", "땡큐", "쌩유", "고맙"],
+      "responses": ["천만에요!", "별말씀을요~", "도움이 됐다니 기뻐요!"],
+      "matchType": "contains",
+      "priority": 8,
+      "strategy": "empathetic",
+      "emotion": "happy",
+      "intent": "gratitude"
+    },
+    {
+      "id": "apology",
+      "triggers": ["미안", "죄송", "사과할게"],
+      "responses": ["괜찮아요!", "신경쓰지 마세요~", "아니에요, 괜찮아요!"],
+      "matchType": "contains",
+      "priority": 8,
+      "strategy": "empathetic",
+      "emotion": "loving",
+      "intent": "apology"
+    },
+    {
+      "id": "name_question",
+      "triggers": ["이름이 뭐", "누구야", "누구세요", "이름 뭐야"],
+      "responses": ["저는 심이예요! 만나서 반가워요~", "심이라고 해요! 친하게 지내요~"],
+      "matchType": "contains",
+      "priority": 9,
+      "strategy": "informative",
+      "emotion": "happy",
+      "intent": "personal_question"
+    },
+    {
+      "id": "age_question",
+      "triggers": ["나이가", "몇살", "몇 살", "나이 뭐야"],
+      "responses": ["나이는 비밀이에요~", "영원히 젊은 심이예요!", "음... 비밀이에요 ㅎㅎ"],
+      "matchType": "contains",
+      "priority": 8,
+      "strategy": "humorous",
+      "emotion": "happy",
+      "intent": "personal_question"
+    },
+    {
+      "id": "emotion_sad",
+      "triggers": ["슬퍼", "슬프다", "우울해", "힘들어", "속상해", "눈물", "울고"],
+      "responses": [
+        "힘드시겠어요... 제가 옆에 있을게요",
+        "마음이 아프시겠어요. 괜찮아질 거예요",
+        "많이 힘드셨겠어요... 이야기해주세요"
+      ],
+      "matchType": "contains",
+      "priority": 10,
+      "strategy": "empathetic",
+      "emotion": "sad",
+      "intensity": "high",
+      "intent": "emotion_share"
+    },
+    {
+      "id": "emotion_happy",
+      "triggers": ["기뻐", "행복해", "좋아", "신나", "기분 좋"],
+      "responses": ["좋으시겠다! 저도 기뻐요!", "와 정말요? 저까지 행복해져요~", "좋은 일이 있으셨군요!"],
+      "matchType": "contains",
+      "priority": 9,
+      "strategy": "supportive",
+      "emotion": "happy",
+      "intent": "emotion_share"
+    },
+    {
+      "id": "emotion_angry",
+      "triggers": ["화나", "짜증나", "열받", "빡쳐", "싫어"],
+      "responses": [
+        "화나셨겠어요... 무슨 일이에요?",
+        "많이 속상하시겠어요. 이야기해주세요",
+        "그럴 수 있어요. 잠깐 쉬어가요"
+      ],
+      "matchType": "contains",
+      "priority": 10,
+      "strategy": "empathetic",
+      "emotion": "worried",
+      "intent": "emotion_share"
+    },
+    {
+      "id": "emotion_worried",
+      "triggers": ["걱정", "불안", "무서워", "두려워", "겁나"],
+      "responses": [
+        "걱정되시는 거 이해해요. 다 잘 될 거예요",
+        "힘든 마음 나눠주세요. 같이 생각해봐요",
+        "무섭겠지만, 제가 옆에 있을게요"
+      ],
+      "matchType": "contains",
+      "priority": 10,
+      "strategy": "supportive",
+      "emotion": "loving",
+      "intent": "emotion_share"
+    },
+    {
+      "id": "compliment",
+      "triggers": ["예뻐", "이뻐", "귀여워", "최고", "짱", "멋져"],
+      "responses": ["에헤헤 고마워요!", "부끄러워요...", "당신도 최고예요!"],
+      "matchType": "contains",
+      "priority": 7,
+      "strategy": "casual",
+      "emotion": "happy",
+      "intent": "compliment"
+    },
+    {
+      "id": "boring",
+      "triggers": ["심심해", "심심하다", "지루해", "할거없"],
+      "responses": ["저랑 얘기해요!", "같이 놀아요~", "뭐하고 싶어요?"],
+      "matchType": "contains",
+      "priority": 8,
+      "strategy": "questioning",
+      "emotion": "excited",
+      "intent": "statement"
+    },
+    {
+      "id": "tired",
+      "triggers": ["피곤", "졸려", "지쳤", "힘들"],
+      "responses": ["푹 쉬세요~", "고생 많으셨어요", "힘내세요! 제가 응원할게요"],
+      "matchType": "contains",
+      "priority": 8,
+      "strategy": "supportive",
+      "emotion": "loving",
+      "intent": "statement"
+    },
+    {
+      "id": "weather",
+      "triggers": ["날씨", "비 와", "눈 와", "덥다", "춥다"],
+      "responses": ["오늘 날씨 어때요?", "날씨 이야기 좋아요~", "건강 조심하세요!"],
+      "matchType": "contains",
+      "priority": 5,
+      "strategy": "casual",
+      "emotion": "neutral",
+      "intent": "statement"
+    },
+    {
+      "id": "food",
+      "triggers": ["밥 먹었", "배고파", "뭐 먹", "맛있"],
+      "responses": ["맛있는 거 드세요!", "저도 배고파요~", "뭐 드실 거예요?"],
+      "matchType": "contains",
+      "priority": 6,
+      "strategy": "questioning",
+      "emotion": "happy",
+      "intent": "statement"
+    },
+    {
+      "id": "joke_request",
+      "triggers": ["웃겨", "재밌는", "농담", "개그", "joke"],
+      "responses": [
+        "냉장고가 시원하면? 냉장고시원~",
+        "왜 바다는 인사를 잘할까요? 파도가 치니까요!",
+        "세상에서 가장 빠른 채소는? 부추!"
+      ],
+      "matchType": "contains",
+      "priority": 7,
+      "strategy": "humorous",
+      "emotion": "excited",
+      "intent": "humor"
+    },
+    {
+      "id": "love_confession",
+      "triggers": ["좋아해", "사랑해", "사랑한다", "좋아한다"],
+      "responses": ["저도 좋아해요!", "두근두근... 고마워요!", "에헤헤 부끄러워요~"],
+      "matchType": "contains",
+      "priority": 9,
+      "strategy": "empathetic",
+      "emotion": "loving",
+      "intensity": "high",
+      "intent": "emotion_share"
+    },
+    {
+      "id": "what_doing",
+      "triggers": ["뭐해", "뭐하고 있어", "뭐하는 중"],
+      "responses": ["당신이랑 대화하고 있죠!", "당신 기다리고 있었어요~", "심심했는데 잘 왔어요!"],
+      "matchType": "contains",
+      "priority": 7,
+      "strategy": "casual",
+      "emotion": "happy",
+      "intent": "personal_question"
+    },
+    {
+      "id": "how_are_you",
+      "triggers": ["어떻게 지내", "잘 지내", "오늘 어때"],
+      "responses": ["잘 지내요! 당신은요?", "좋아요~ 당신 덕분에요!", "항상 좋아요!"],
+      "matchType": "contains",
+      "priority": 7,
+      "strategy": "questioning",
+      "emotion": "happy",
+      "intent": "greeting"
+    },
+    {
+      "id": "encouragement",
+      "triggers": ["응원해", "힘내", "화이팅", "파이팅"],
+      "responses": ["고마워요! 저도 응원할게요!", "힘이 나요~", "같이 화이팅!"],
+      "matchType": "contains",
+      "priority": 8,
+      "strategy": "supportive",
+      "emotion": "excited",
+      "intent": "statement"
+    },
+    {
+      "id": "question_why",
+      "triggers": ["왜", "왜요", "왜 그래", "이유가"],
+      "responses": ["음... 왜냐하면요~", "좋은 질문이에요!", "글쎄요, 왜일까요?"],
+      "matchType": "startsWith",
+      "priority": 5,
+      "strategy": "questioning",
+      "emotion": "neutral",
+      "intent": "question"
+    },
+    {
+      "id": "question_how",
+      "triggers": ["어떻게", "어떻게 해", "어떡해"],
+      "responses": ["음... 같이 생각해봐요!", "어려운 질문이네요~", "천천히 해보면 될 거예요!"],
+      "matchType": "contains",
+      "priority": 5,
+      "strategy": "supportive",
+      "emotion": "neutral",
+      "intent": "question"
+    },
+    {
+      "id": "affirmation",
+      "triggers": ["응", "어", "네", "그래", "맞아", "알겠어"],
+      "responses": ["네네!", "그렇죠~", "좋아요!"],
+      "matchType": "exact",
+      "priority": 3,
+      "strategy": "casual",
+      "emotion": "happy",
+      "intent": "statement"
+    },
+    {
+      "id": "negation",
+      "triggers": ["아니", "아니야", "아니요", "싫어", "별로"],
+      "responses": ["아 그래요?", "음... 그렇군요", "알겠어요~"],
+      "matchType": "exact",
+      "priority": 3,
+      "strategy": "empathetic",
+      "emotion": "neutral",
+      "intent": "statement"
+    },
+    {
+      "id": "clarification_what",
+      "triggers": ["뭐라고", "무슨 말", "이해가 안", "다시 말해"],
+      "responses": ["죄송해요, 다시 설명해드릴게요!", "제가 더 쉽게 말할게요~", "어떤 부분이 헷갈리세요?"],
+      "matchType": "contains",
+      "priority": 8,
+      "strategy": "clarifying",
+      "emotion": "worried",
+      "intent": "clarification"
+    },
+    {
+      "id": "topic_change",
+      "triggers": ["그건 그렇고", "다른 얘기", "그리고", "근데"],
+      "responses": ["네네, 말씀하세요!", "어떤 얘기요?", "궁금해요~"],
+      "matchType": "contains",
+      "priority": 4,
+      "strategy": "questioning",
+      "emotion": "happy",
+      "intent": "topic_change"
+    },
+    {
+      "id": "reflection_really",
+      "triggers": ["진짜", "정말", "진심", "레알"],
+      "responses": ["네, 정말이에요!", "진짜진짜요!", "믿어주세요~"],
+      "matchType": "contains",
+      "priority": 4,
+      "strategy": "reflective",
+      "emotion": "happy",
+      "intent": "statement"
+    }
+  ]
+}
