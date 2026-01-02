@@ -1,0 +1,34 @@
+{
+  "name": "simi-platform",
+  "version": "1.0.0",
+  "private": true,
+  "description": "AI Character Chatbot Platform - CLI + SDK + Web UI",
+  "keywords": ["chatbot", "ai", "neural-network", "nlp", "korean", "typescript"],
+  "author": "hwkim3330",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hwkim3330/sim.git"
+  },
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "pnpm -r build",
+    "dev": "pnpm -r --parallel dev",
+    "clean": "pnpm -r clean",
+    "test": "pnpm -r test",
+    "lint": "eslint packages/*/src --ext .ts",
+    "typecheck": "pnpm -r typecheck"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "esbuild": "^0.19.10",
+    "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
+  },
+  "packageManager": "pnpm@8.12.0"
+}
