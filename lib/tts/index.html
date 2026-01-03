@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simi TTS - GLaDOS Voice Synthesizer</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg-primary: #0a0a0a;
+      --bg-secondary: #1a1a1a;
+      --bg-tertiary: #252525;
+      --text-primary: #e0e0e0;
+      --text-secondary: #888;
+      --accent: #f90;
+      --accent-dim: #c70;
+      --glow: rgba(255, 153, 0, 0.3);
+    }
+
+    body {
+      font-family: 'Courier New', monospace;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+    }
+
+    .container {
+      max-width: 800px;
+      width: 100%;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    h1 {
+      font-size: 2.5em;
+      color: var(--accent);
+      text-shadow: 0 0 20px var(--glow);
+      margin-bottom: 10px;
+      letter-spacing: 3px;
+    }
+
+    .subtitle {
+      color: var(--text-secondary);
+      font-size: 1em;
+    }
+
+    .aperture-logo {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 20px;
+      border: 2px solid var(--accent);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: pulse 2s infinite;
+    }
+
+    .aperture-logo::before {
+      content: '◎';
+      font-size: 40px;
+      color: var(--accent);
+    }
+
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 10px var(--glow); }
+      50% { box-shadow: 0 0 30px var(--glow); }
+    }
+
+    .panel {
+      background: var(--bg-secondary);
+      border: 1px solid var(--bg-tertiary);
+      border-radius: 8px;
+      padding: 30px;
+      margin-bottom: 20px;
+    }
+
+    .input-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+      font-size: 0.9em;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 120px;
+      background: var(--bg-tertiary);
+      border: 1px solid #333;
+      border-radius: 4px;
+      padding: 15px;
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 1em;
+      resize: vertical;
+    }
+
+    textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 10px var(--glow);
+    }
+
+    .voice-selector {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .voice-option {
+      background: var(--bg-tertiary);
+      border: 2px solid transparent;
+      border-radius: 4px;
+      padding: 15px;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s;
+    }
+
+    .voice-option:hover {
+      border-color: var(--accent-dim);
+    }
+
+    .voice-option.active {
+      border-color: var(--accent);
+      background: rgba(255, 153, 0, 0.1);
+    }
+
+    .voice-option .name {
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .voice-option .desc {
+      font-size: 0.8em;
+      color: var(--text-secondary);
+    }
+
+    .voice-option.glados {
+      border-color: var(--accent);
+    }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      background: var(--accent);
+      color: #000;
+      border: none;
+      padding: 15px 30px;
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 1em;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    button:hover {
+      background: var(--accent-dim);
+      box-shadow: 0 0 20px var(--glow);
+    }
+
+    button:disabled {
+      background: #444;
+      color: #666;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    button.secondary {
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+      border: 1px solid #444;
+    }
+
+    button.secondary:hover {
+      border-color: var(--accent);
+    }
+
+    .progress-bar {
+      height: 4px;
+      background: var(--bg-tertiary);
+      border-radius: 2px;
+      margin-top: 20px;
+      overflow: hidden;
+      display: none;
+    }
+
+    .progress-bar.active {
+      display: block;
+    }
+
+    .progress-bar .fill {
+      height: 100%;
+      background: var(--accent);
+      width: 0;
+      transition: width 0.1s;
+    }
+
+    .presets {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .preset {
+      background: var(--bg-tertiary);
+      border: 1px solid #333;
+      padding: 8px 15px;
+      border-radius: 20px;
+      font-size: 0.85em;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .preset:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .status {
+      text-align: center;
+      padding: 20px;
+      color: var(--text-secondary);
+      font-size: 0.9em;
+    }
+
+    .status.speaking {
+      color: var(--accent);
+    }
+
+    .waveform {
+      height: 60px;
+      background: var(--bg-tertiary);
+      border-radius: 4px;
+      margin-top: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .waveform-bars {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      height: 100%;
+      padding: 10px;
+    }
+
+    .waveform-bar {
+      width: 3px;
+      background: var(--accent);
+      border-radius: 2px;
+      transition: height 0.1s;
+    }
+
+    footer {
+      margin-top: 40px;
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: 0.85em;
+    }
+
+    footer a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+    .info-box {
+      background: rgba(255, 153, 0, 0.1);
+      border-left: 3px solid var(--accent);
+      padding: 15px;
+      margin-bottom: 20px;
+      font-size: 0.9em;
+    }
+
+    .info-box strong {
+      color: var(--accent);
+    }
+
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 1.8em;
+      }
+
+      .controls {
+        flex-direction: column;
+      }
+
+      button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="aperture-logo"></div>
+      <h1>SIMI TTS</h1>
+      <p class="subtitle">Klatt Formant Speech Synthesizer</p>
+    </header>
+
+    <div class="info-box">
+      <strong>GLaDOS Mode:</strong> Experience AI-style speech synthesis using
+      pure JavaScript formant synthesis. No external dependencies or API calls.
+    </div>
+
+    <div class="panel">
+      <div class="input-group">
+        <label>Voice Model</label>
+        <div class="voice-selector">
+          <div class="voice-option glados active" data-voice="glados">
+            <div class="name">GLaDOS</div>
+            <div class="desc">AI Assistant</div>
+          </div>
+          <div class="voice-option" data-voice="robot">
+            <div class="name">Robot</div>
+            <div class="desc">Monotone</div>
+          </div>
+          <div class="voice-option" data-voice="female">
+            <div class="name">Female</div>
+            <div class="desc">Natural</div>
+          </div>
+          <div class="voice-option" data-voice="male">
+            <div class="name">Male</div>
+            <div class="desc">Natural</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label>Text to Synthesize</label>
+        <textarea id="text-input" placeholder="Enter text to synthesize...">Hello, and welcome to the Aperture Science Enrichment Center.</textarea>
+      </div>
+
+      <div class="input-group">
+        <label>Quick Phrases</label>
+        <div class="presets">
+          <span class="preset" data-text="Hello, and welcome to the Aperture Science Enrichment Center.">Welcome</span>
+          <span class="preset" data-text="The cake is a lie.">Cake</span>
+          <span class="preset" data-text="This was a triumph. I'm making a note here: huge success.">Triumph</span>
+          <span class="preset" data-text="I'm doing science and I'm still alive.">Still Alive</span>
+          <span class="preset" data-text="Please proceed to the testing chamber.">Testing</span>
+          <span class="preset" data-text="Good morning. You have been in suspension for fifty days.">Morning</span>
+          <span class="preset" data-text="Error. Error. Error.">Error</span>
+        </div>
+      </div>
+
+      <div class="controls">
+        <button id="speak-btn">▶ Speak</button>
+        <button id="download-btn" class="secondary">⬇ Download WAV</button>
+      </div>
+
+      <div class="progress-bar" id="progress">
+        <div class="fill" id="progress-fill"></div>
+      </div>
+
+      <div class="waveform" id="waveform">
+        <div class="waveform-bars" id="waveform-bars"></div>
+      </div>
+
+      <div class="status" id="status">Ready</div>
+    </div>
+
+    <footer>
+      <p>
+        Simi TTS v1.0.0 |
+        <a href="https://github.com/hwkim3330/sim" target="_blank">GitHub</a> |
+        Pure JavaScript, No Dependencies
+      </p>
+      <p style="margin-top: 10px;">
+        Based on Klatt 1980 Formant Synthesis
+      </p>
+    </footer>
+  </div>
+
+  <script src="simi-tts.js"></script>
+  <script>
+    const { TTS, Voice } = SimiTTS;
+
+    // Initialize TTS
+    const tts = new TTS({ voice: Voice.glados });
+
+    // DOM elements
+    const textInput = document.getElementById('text-input');
+    const speakBtn = document.getElementById('speak-btn');
+    const downloadBtn = document.getElementById('download-btn');
+    const progress = document.getElementById('progress');
+    const progressFill = document.getElementById('progress-fill');
+    const status = document.getElementById('status');
+    const waveformBars = document.getElementById('waveform-bars');
+
+    // Voice selector
+    document.querySelectorAll('.voice-option').forEach(option => {
+      option.addEventListener('click', () => {
+        document.querySelectorAll('.voice-option').forEach(o => o.classList.remove('active'));
+        option.classList.add('active');
+        const voiceName = option.dataset.voice;
+        tts.setVoice(voiceName);
+        status.textContent = `Voice: ${voiceName.toUpperCase()}`;
+      });
+    });
+
+    // Preset phrases
+    document.querySelectorAll('.preset').forEach(preset => {
+      preset.addEventListener('click', () => {
+        textInput.value = preset.dataset.text;
+      });
+    });
+
+    // Create waveform bars
+    for (let i = 0; i < 40; i++) {
+      const bar = document.createElement('div');
+      bar.className = 'waveform-bar';
+      bar.style.height = '5px';
+      waveformBars.appendChild(bar);
+    }
+    const bars = waveformBars.querySelectorAll('.waveform-bar');
+
+    // Animate waveform
+    let animationId = null;
+    function animateWaveform(active) {
+      if (animationId) {
+        cancelAnimationFrame(animationId);
+        animationId = null;
+      }
+
+      if (!active) {
+        bars.forEach(bar => bar.style.height = '5px');
+        return;
+      }
+
+      function update() {
+        bars.forEach((bar, i) => {
+          const height = active
+            ? 5 + Math.random() * 40
+            : 5;
+          bar.style.height = height + 'px';
+        });
+        if (active) {
+          animationId = requestAnimationFrame(update);
+        }
+      }
+      update();
+    }
+
+    // Speak button
+    let speaking = false;
+    speakBtn.addEventListener('click', async () => {
+      if (speaking) return;
+
+      const text = textInput.value.trim();
+      if (!text) {
+        status.textContent = 'Please enter text to synthesize';
+        return;
+      }
+
+      speaking = true;
+      speakBtn.disabled = true;
+      speakBtn.textContent = '◼ Speaking...';
+      status.textContent = 'Synthesizing...';
+      status.classList.add('speaking');
+      progress.classList.add('active');
+      animateWaveform(true);
+
+      try {
+        await tts.speak(text, (p) => {
+          progressFill.style.width = (p * 100) + '%';
+        });
+
+        status.textContent = 'Complete';
+      } catch (err) {
+        console.error(err);
+        status.textContent = 'Error: ' + err.message;
+      } finally {
+        speaking = false;
+        speakBtn.disabled = false;
+        speakBtn.textContent = '▶ Speak';
+        status.classList.remove('speaking');
+        animateWaveform(false);
+
+        setTimeout(() => {
+          progress.classList.remove('active');
+          progressFill.style.width = '0';
+        }, 500);
+      }
+    });
+
+    // Download button
+    downloadBtn.addEventListener('click', () => {
+      const text = textInput.value.trim();
+      if (!text) {
+        status.textContent = 'Please enter text to synthesize';
+        return;
+      }
+
+      status.textContent = 'Generating WAV...';
+      setTimeout(() => {
+        tts.download(text, 'simi-speech.wav');
+        status.textContent = 'WAV downloaded!';
+      }, 100);
+    });
+
+    // Auto-init on first interaction
+    document.body.addEventListener('click', async () => {
+      await tts.init();
+    }, { once: true });
+  </script>
+</body>
+</html>
