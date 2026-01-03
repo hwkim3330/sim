@@ -1,4 +1,4 @@
-# Simi TTS v3.0
+# Simi TTS
 
 A dependency-free, browser-based Text-to-Speech engine using Klatt formant synthesis.
 
@@ -8,16 +8,6 @@ A dependency-free, browser-based Text-to-Speech engine using Klatt formant synth
 - 🤖 GLaDOS-style voice preset
 - 📥 WAV file export
 - 📝 TypeScript support
-- 🇰🇷 **Native Korean support** with phonological rules
-- 🔊 Optimized robotization effect
-
-## What's New in v3.0
-
-- **Korean Phoneme Database**: Accurate formant values based on Korean phonetics research
-- **Phonological Rules**: 연음, 경음화, 비음화, 구개음화, 격음화 자동 적용
-- **Diphthong Transitions**: Smooth glide between vowels (ㅑ, ㅕ, ㅘ, ㅝ 등)
-- **Performance**: Removed slow FFT-based processing, much faster synthesis
-- **New Voice Presets**: `korean`, `koreanGlados`
 
 ## Quick Start
 
@@ -123,31 +113,6 @@ tts.download("Hello world!", "speech.wav");
 | `female` | Higher pitch |
 | `robot` | Monotone, flat pitch |
 | `glados` | AI assistant style with effects |
-| `gladosAngry` | GLaDOS emotional variant |
-| `wheatley` | Wheatley-style nervous voice |
-
-## Korean Language Support
-
-Simi TTS supports Korean (한국어) with automatic language detection:
-
-```javascript
-const tts = new TTS({ voice: Voice.glados });
-
-// Korean text
-await tts.speak("안녕하세요. 애퍼처 사이언스에 오신 것을 환영합니다.");
-
-// Mixed Korean + English
-await tts.speak("Hello! 안녕하세요!");
-
-// Force language (optional)
-const phonemes = SimiTTS.textToPhonemes("안녕하세요", "ko");
-```
-
-### Korean Phoneme Conversion
-
-- Decomposes Hangul syllables into jamo (초성, 중성, 종성)
-- Maps to ARPAbet-like phonemes for synthesis
-- Handles 받침 (final consonants) correctly
 
 ## GLaDOS Voice
 
