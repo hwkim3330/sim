@@ -1,4 +1,4 @@
-# Simi TTS
+# Simi TTS v3.0
 
 A dependency-free, browser-based Text-to-Speech engine using Klatt formant synthesis.
 
@@ -8,8 +8,16 @@ A dependency-free, browser-based Text-to-Speech engine using Klatt formant synth
 - 🤖 GLaDOS-style voice preset
 - 📥 WAV file export
 - 📝 TypeScript support
-- 🇰🇷 Korean language support (한국어 지원)
-- 🔊 Phase vocoder robotization
+- 🇰🇷 **Native Korean support** with phonological rules
+- 🔊 Optimized robotization effect
+
+## What's New in v3.0
+
+- **Korean Phoneme Database**: Accurate formant values based on Korean phonetics research
+- **Phonological Rules**: 연음, 경음화, 비음화, 구개음화, 격음화 자동 적용
+- **Diphthong Transitions**: Smooth glide between vowels (ㅑ, ㅕ, ㅘ, ㅝ 등)
+- **Performance**: Removed slow FFT-based processing, much faster synthesis
+- **New Voice Presets**: `korean`, `koreanGlados`
 
 ## Quick Start
 
