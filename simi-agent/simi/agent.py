@@ -35,6 +35,8 @@ class AgentConfig:
     # Engine settings
     vlm_model_path: Optional[str] = None
     vlm_device: str = "CPU"
+    vlm_threads: int = 0  # 0 = auto
+    vlm_performance: str = "latency"  # "latency" or "throughput"
     claude_api_key: Optional[str] = None
     claude_model: str = "claude-sonnet-4-20250514"
 
@@ -132,6 +134,8 @@ class Agent:
             return HybridEngine(
                 vlm_path=self.config.vlm_model_path,
                 vlm_device=self.config.vlm_device,
+                vlm_threads=self.config.vlm_threads,
+                vlm_performance=self.config.vlm_performance,
                 claude_api_key=self.config.claude_api_key,
                 claude_model=self.config.claude_model,
                 prefer_local=self.config.prefer_local,
@@ -140,6 +144,8 @@ class Agent:
             return VLMEngine(
                 self.config.vlm_model_path,
                 self.config.vlm_device,
+                num_threads=self.config.vlm_threads,
+                performance_hint=self.config.vlm_performance,
             )
         elif has_claude:
             return ClaudeEngine(

@@ -77,6 +77,19 @@ Press Ctrl+C to interrupt generation.[/dim]
     help="Device for local inference"
 )
 @click.option(
+    "-t", "--threads",
+    default=0,
+    type=int,
+    help="Number of CPU threads (0 = auto)"
+)
+@click.option(
+    "--perf", "--performance",
+    "performance",
+    default="latency",
+    type=click.Choice(["latency", "throughput"]),
+    help="Performance mode: latency (fast) or throughput (batch)"
+)
+@click.option(
     "--prefer-local/--prefer-api",
     default=True,
     help="Prefer local model over API"
@@ -91,6 +104,8 @@ def main(
     model: Optional[str],
     api_key: Optional[str],
     device: str,
+    threads: int,
+    performance: str,
     prefer_local: bool,
     verbose: bool,
 ):
@@ -128,6 +143,8 @@ def main(
         config = AgentConfig(
             vlm_model_path=model,
             vlm_device=device,
+            vlm_threads=threads,
+            vlm_performance=performance,
             claude_api_key=api_key,
             prefer_local=prefer_local,
         )

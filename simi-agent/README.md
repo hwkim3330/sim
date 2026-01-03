@@ -10,6 +10,7 @@ A hybrid AI coding assistant that combines local VLM inference with Claude API.
 - 👁️ **Vision** - Analyze images and screenshots
 - 🔄 **ReAct Loop** - Reasoning + Acting for multi-step tasks
 - 📡 **Streaming** - Real-time token output
+- ⚡ **Intel Optimized** - AVX512, AMX, NPU support for Intel CPUs
 
 ## Installation
 
@@ -169,6 +170,37 @@ result = engine.force_api(messages)     # Always API
 | `/stats` | Show usage stats |
 | `/exit` | Exit |
 
+## Intel CPU Optimization
+
+Simi Agent is optimized for Intel CPUs with hardware acceleration:
+
+```bash
+# Use 8 CPU threads with latency optimization
+simi -m models/qwen2.5-vl-3b -t 8 --perf latency
+
+# Use Intel NPU (Core Ultra)
+simi -m models/qwen2.5-vl-3b -d NPU
+
+# Use Intel Arc GPU
+simi -m models/qwen2.5-vl-3b -d GPU
+```
+
+### Supported Hardware
+
+| Device | Description |
+|--------|-------------|
+| `CPU` | Intel Core/Xeon with AVX512/AMX |
+| `GPU` | Intel Arc (A380/A580/A770) |
+| `NPU` | Intel Core Ultra AI Boost |
+| `AUTO` | Automatic device selection |
+
+### Performance Tips
+
+1. **INT4 Quantization** - Use `--weight-format int4` when exporting
+2. **Thread Affinity** - `-t` flag pins to specific core count
+3. **Latency Mode** - `--perf latency` for interactive use
+4. **Throughput Mode** - `--perf throughput` for batch processing
+
 ## Environment Variables
 
 | Variable | Description |
@@ -176,6 +208,7 @@ result = engine.force_api(messages)     # Always API
 | `ANTHROPIC_API_KEY` | Claude API key |
 | `SIMI_MODEL_PATH` | Default model path |
 | `SIMI_DEVICE` | Default device (CPU/GPU/NPU) |
+| `OMP_NUM_THREADS` | OpenMP thread count |
 
 ## Requirements
 

@@ -1,10 +1,13 @@
 """
 OpenVINO VLM Engine for local inference.
+
+Optimized for Intel CPUs (AVX512, AMX), Intel GPUs (Arc), and NPUs (Core Ultra).
 """
 
 from __future__ import annotations
 
 import base64
+import os
 import re
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, AsyncIterator, Optional, Union
@@ -20,8 +23,15 @@ class VLMEngine(BaseEngine):
     """
     Local Vision-Language Model engine using OpenVINO GenAI.
 
+    Intel-optimized features:
+    - AVX512/AVX-VNNI/AMX acceleration on supported CPUs
+    - INT4/INT8 quantization support
+    - KV-cache for efficient inference
+    - NPU offload for Intel Core Ultra processors
+    - Multi-threaded inference with CPU affinity
+
     Supports models like:
-    - Qwen2.5-VL
+    - Qwen2.5-VL (recommended)
     - Phi-3-vision
     - LLaVA
     - MiniCPM-V
@@ -29,6 +39,14 @@ class VLMEngine(BaseEngine):
     Example:
         >>> engine = VLMEngine("models/qwen2.5-vl-3b")
         >>> response = engine.generate([Message.user("Hello!")])
+
+        >>> # With Intel optimizations
+        >>> engine = VLMEngine(
+        ...     "models/qwen2.5-vl-3b",
+        ...     device="CPU",
+        ...     num_threads=8,
+        ...     performance_hint="latency"
+        ... )
     """
 
     def __init__(
@@ -38,49 +56,147 @@ class VLMEngine(BaseEngine):
         *,
         enable_cache: bool = True,
         num_threads: int = 0,
+        performance_hint: str = "latency",
+        enable_mmap: bool = True,
+        cpu_affinity: Optional[list[int]] = None,
     ):
         """
-        Initialize VLM engine.
+        Initialize VLM engine with Intel CPU optimizations.
 
         Args:
             model_path: Path to OpenVINO model directory
             device: Device to run on ("CPU", "GPU", "NPU", "AUTO")
             enable_cache: Enable KV-cache for faster inference
-            num_threads: Number of CPU threads (0 = auto)
+            num_threads: Number of CPU threads (0 = auto-detect)
+            performance_hint: "latency" (fast response) or "throughput" (batch)
+            enable_mmap: Memory-map model weights (reduces RAM usage)
+            cpu_affinity: Pin to specific CPU cores (e.g., [0,1,2,3])
         """
         self.model_path = Path(model_path)
-        self.device = device
+        self.device = device.upper()
         self.enable_cache = enable_cache
         self.num_threads = num_threads
+        self.performance_hint = performance_hint
+        self.enable_mmap = enable_mmap
+        self.cpu_affinity = cpu_affinity
 
         self._pipeline: Any = None
         self._loaded = False
+        self._device_info: dict[str, Any] = {}
+
+        # Configure environment for Intel optimizations
+        self._configure_environment()
 
         # Load model
         self._load_model()
 
+    def _configure_environment(self) -> None:
+        """Configure environment variables for Intel CPU optimization."""
+        if self.device == "CPU":
+            # Enable Intel optimizations
+            os.environ.setdefault("OMP_NUM_THREADS", str(self.num_threads or os.cpu_count() or 4))
+            os.environ.setdefault("KMP_AFFINITY", "granularity=fine,compact,1,0")
+            os.environ.setdefault("KMP_BLOCKTIME", "1")
+
+            # Enable AVX512/AMX if available
+            os.environ.setdefault("ONEDNN_MAX_CPU_ISA", "ALL")
+
     def _load_model(self) -> None:
-        """Load the OpenVINO model."""
+        """Load the OpenVINO model with optimized configuration."""
         try:
             import openvino_genai as ov_genai
+            import openvino as ov
 
+            # Get device info
+            core = ov.Core()
+            self._device_info = self._get_device_info(core)
+
+            # Build config
+            config = self._build_config()
+
+            # Load pipeline
             self._pipeline = ov_genai.VLMPipeline(
                 str(self.model_path),
-                self.device
+                self.device,
+                **config
             )
             self._loaded = True
 
         except ImportError:
             raise ImportError(
                 "OpenVINO GenAI not installed. "
-                "Install with: pip install openvino-genai"
+                "Install with: pip install openvino-genai openvino"
             )
         except Exception as e:
             raise RuntimeError(f"Failed to load model: {e}")
 
+    def _get_device_info(self, core: Any) -> dict[str, Any]:
+        """Get detailed device information."""
+        info = {
+            "device": self.device,
+            "available_devices": core.available_devices,
+        }
+
+        try:
+            if self.device == "CPU":
+                info["cpu_name"] = core.get_property("CPU", "FULL_DEVICE_NAME")
+                info["num_streams"] = core.get_property("CPU", "NUM_STREAMS")
+                info["threads"] = core.get_property("CPU", "INFERENCE_NUM_THREADS")
+            elif self.device == "GPU":
+                info["gpu_name"] = core.get_property("GPU", "FULL_DEVICE_NAME")
+            elif self.device == "NPU":
+                info["npu_name"] = core.get_property("NPU", "FULL_DEVICE_NAME")
+        except Exception:
+            pass
+
+        return info
+
+    def _build_config(self) -> dict[str, Any]:
+        """Build OpenVINO configuration for optimal performance."""
+        config: dict[str, Any] = {}
+
+        if self.device == "CPU":
+            # CPU-specific optimizations
+            if self.num_threads > 0:
+                config["INFERENCE_NUM_THREADS"] = self.num_threads
+
+            # Performance hint
+            if self.performance_hint == "latency":
+                config["PERFORMANCE_HINT"] = "LATENCY"
+            elif self.performance_hint == "throughput":
+                config["PERFORMANCE_HINT"] = "THROUGHPUT"
+
+            # Enable CPU pinning for consistent performance
+            if self.cpu_affinity:
+                config["CPU_BIND_THREAD"] = "YES"
+
+            # Memory optimization
+            if self.enable_mmap:
+                config["ENABLE_MMAP"] = True
+
+        elif self.device == "NPU":
+            # NPU-specific (Intel Core Ultra)
+            config["PERFORMANCE_HINT"] = "LATENCY"
+            config["NPU_USE_NPUW"] = True  # Use NPU Wrapper
+
+        elif self.device == "GPU":
+            # Intel Arc GPU
+            config["PERFORMANCE_HINT"] = "LATENCY"
+            config["GPU_HINT"] = "LATENCY"
+
+        return config
+
     @property
     def name(self) -> str:
-        return f"VLM({self.model_path.name})"
+        device_suffix = f"@{self.device}"
+        if self.num_threads > 0:
+            device_suffix += f"x{self.num_threads}"
+        return f"VLM({self.model_path.name}{device_suffix})"
+
+    @property
+    def device_info(self) -> dict[str, Any]:
+        """Get device information and capabilities."""
+        return self._device_info.copy()
 
     @property
     def supports_vision(self) -> bool:

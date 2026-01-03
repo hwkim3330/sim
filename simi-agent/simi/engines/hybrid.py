@@ -41,6 +41,8 @@ class HybridEngine(BaseEngine):
         self,
         vlm_path: Optional[str] = None,
         vlm_device: str = "CPU",
+        vlm_threads: int = 0,
+        vlm_performance: str = "latency",
         claude_api_key: Optional[str] = None,
         claude_model: str = "claude-sonnet-4-20250514",
         *,
@@ -54,7 +56,9 @@ class HybridEngine(BaseEngine):
 
         Args:
             vlm_path: Path to local VLM model
-            vlm_device: Device for local inference
+            vlm_device: Device for local inference ("CPU", "GPU", "NPU", "AUTO")
+            vlm_threads: Number of CPU threads (0 = auto)
+            vlm_performance: Performance hint ("latency" or "throughput")
             claude_api_key: Anthropic API key
             claude_model: Claude model to use
             prefer_local: Prefer local model when possible
@@ -77,8 +81,13 @@ class HybridEngine(BaseEngine):
 
         if vlm_path:
             try:
-                self._vlm = VLMEngine(vlm_path, vlm_device)
-                logger.info(f"Local VLM loaded: {vlm_path}")
+                self._vlm = VLMEngine(
+                    vlm_path,
+                    vlm_device,
+                    num_threads=vlm_threads,
+                    performance_hint=vlm_performance,
+                )
+                logger.info(f"Local VLM loaded: {self._vlm.name}")
             except Exception as e:
                 logger.warning(f"Failed to load local VLM: {e}")
 
