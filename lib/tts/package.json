@@ -1,0 +1,37 @@
+{
+  "name": "simi-tts",
+  "version": "2.0.0",
+  "description": "Klatt formant speech synthesizer with GLaDOS voice - supports English & Korean",
+  "main": "simi-tts.js",
+  "module": "simi-tts.js",
+  "browser": "simi-tts.min.js",
+  "types": "simi-tts.d.ts",
+  "scripts": {
+    "build": "terser simi-tts.js -c -m --comments false -o simi-tts.min.js",
+    "build:source-map": "terser simi-tts.js -c -m --source-map -o simi-tts.min.js"
+  },
+  "keywords": [
+    "tts",
+    "text-to-speech",
+    "speech-synthesis",
+    "klatt",
+    "formant",
+    "glados",
+    "korean",
+    "hangul"
+  ],
+  "author": "hwkim3330",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hwkim3330/sim.git"
+  },
+  "devDependencies": {
+    "terser": "^5.44.1"
+  },
+  "files": [
+    "simi-tts.js",
+    "simi-tts.min.js",
+    "simi-tts.d.ts"
+  ]
+}
