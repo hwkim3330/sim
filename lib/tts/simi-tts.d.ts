@@ -71,6 +71,19 @@ declare module 'simi-tts' {
      * Download synthesized speech as WAV file
      */
     download(text: string, filename?: string): void;
+
+    /**
+     * Sing a melody with pitch control
+     * @param melody Array of notes with text, pitch (Hz), and duration (ms)
+     * @param onProgress Optional progress callback (0-1)
+     */
+    sing(melody: MelodyNote[], onProgress?: (progress: number) => void): Promise<void>;
+  }
+
+  export interface MelodyNote {
+    text: string;
+    pitch: number;
+    duration: number;
   }
 
   export const Voice: VoicePresets;
@@ -78,6 +91,8 @@ declare module 'simi-tts' {
   export function textToPhonemes(text: string): string[];
 
   export const PHONEMES: PhonemeData;
+
+  export const DAISY_BELL: MelodyNote[];
 
   export const version: string;
 }
@@ -89,6 +104,7 @@ declare global {
       Voice: import('simi-tts').VoicePresets;
       textToPhonemes: typeof import('simi-tts').textToPhonemes;
       PHONEMES: import('simi-tts').PhonemeData;
+      DAISY_BELL: import('simi-tts').MelodyNote[];
       version: string;
     };
   }

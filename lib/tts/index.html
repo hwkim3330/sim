@@ -384,6 +384,7 @@
       <div class="controls">
         <button id="speak-btn">▶ Speak</button>
         <button id="download-btn" class="secondary">⬇ Download WAV</button>
+        <button id="daisy-btn" class="secondary">🎵 Daisy Bell</button>
       </div>
 
       <div class="progress-bar" id="progress">
@@ -411,7 +412,7 @@
 
   <script src="simi-tts.js"></script>
   <script>
-    const { TTS, Voice } = SimiTTS;
+    const { TTS, Voice, DAISY_BELL } = SimiTTS;
 
     // Initialize TTS
     const tts = new TTS({ voice: Voice.glados });
@@ -534,6 +535,43 @@
         tts.download(text, 'simi-speech.wav');
         status.textContent = 'WAV downloaded!';
       }, 100);
+    });
+
+    // Daisy Bell button (HAL 9000 tribute)
+    const daisyBtn = document.getElementById('daisy-btn');
+    daisyBtn.addEventListener('click', async () => {
+      if (speaking) return;
+
+      speaking = true;
+      speakBtn.disabled = true;
+      daisyBtn.disabled = true;
+      daisyBtn.textContent = '🎵 Singing...';
+      status.textContent = 'Singing Daisy Bell (1961)...';
+      status.classList.add('speaking');
+      progress.classList.add('active');
+      animateWaveform(true);
+
+      try {
+        await tts.sing(DAISY_BELL, (p) => {
+          progressFill.style.width = (p * 100) + '%';
+        });
+        status.textContent = 'Daisy Bell complete!';
+      } catch (err) {
+        console.error(err);
+        status.textContent = 'Error: ' + err.message;
+      } finally {
+        speaking = false;
+        speakBtn.disabled = false;
+        daisyBtn.disabled = false;
+        daisyBtn.textContent = '🎵 Daisy Bell';
+        status.classList.remove('speaking');
+        animateWaveform(false);
+
+        setTimeout(() => {
+          progress.classList.remove('active');
+          progressFill.style.width = '0';
+        }, 500);
+      }
     });
 
     // Auto-init on first interaction
