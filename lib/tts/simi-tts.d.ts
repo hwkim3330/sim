@@ -1,5 +1,7 @@
 /**
  * Simi TTS - TypeScript Declarations
+ * @version 2.0.0
+ * Supports: English, Korean (한국어)
  */
 
 declare module 'simi-tts' {

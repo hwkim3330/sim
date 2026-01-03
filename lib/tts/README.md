@@ -8,6 +8,7 @@ A dependency-free, browser-based Text-to-Speech engine using Klatt formant synth
 - 🤖 GLaDOS-style voice preset
 - 📥 WAV file export
 - 📝 TypeScript support
+- 🇰🇷 Korean (한국어) support
 
 ## Quick Start
 
@@ -103,6 +104,23 @@ Download as WAV file.
 ```javascript
 tts.download("Hello world!", "speech.wav");
 ```
+
+## Korean Support
+
+Simi TTS supports Korean (한글) text automatically:
+
+```javascript
+const tts = new TTS({ voice: Voice.glados });
+
+// Korean text is automatically detected
+await tts.speak("안녕하세요");
+await tts.speak("케이크는 거짓말입니다");
+```
+
+The Korean phoneme system includes:
+- All 19 initial consonants (초성): ㄱ ㄲ ㄴ ㄷ ㄸ ㄹ ㅁ ㅂ ㅃ ㅅ ㅆ ㅇ ㅈ ㅉ ㅊ ㅋ ㅌ ㅍ ㅎ
+- All 21 vowels (중성): ㅏ ㅐ ㅑ ㅒ ㅓ ㅔ ㅕ ㅖ ㅗ ㅘ ㅙ ㅚ ㅛ ㅜ ㅝ ㅞ ㅟ ㅠ ㅡ ㅢ ㅣ
+- All 27 final consonants (종성)
 
 ## Voice Presets
 
