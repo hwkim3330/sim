@@ -73,9 +73,17 @@ declare module 'simi-tts' {
 
   export const Voice: VoicePresets;
 
-  export function textToPhonemes(text: string): string[];
+  export function textToPhonemes(text: string, lang?: 'auto' | 'en' | 'ko'): string[];
+
+  export function koreanToPhonemes(text: string): string[];
+
+  export function decomposeHangul(char: string): { initial: string; vowel: string; final: string } | null;
+
+  export function isHangul(char: string): boolean;
 
   export const PHONEMES: PhonemeData;
+
+  export const KOREAN_DICTIONARY: { [word: string]: string[] };
 
   export const version: string;
 }

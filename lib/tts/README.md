@@ -8,6 +8,8 @@ A dependency-free, browser-based Text-to-Speech engine using Klatt formant synth
 - 🤖 GLaDOS-style voice preset
 - 📥 WAV file export
 - 📝 TypeScript support
+- 🇰🇷 Korean language support (한국어 지원)
+- 🔊 Phase vocoder robotization
 
 ## Quick Start
 
@@ -113,6 +115,31 @@ tts.download("Hello world!", "speech.wav");
 | `female` | Higher pitch |
 | `robot` | Monotone, flat pitch |
 | `glados` | AI assistant style with effects |
+| `gladosAngry` | GLaDOS emotional variant |
+| `wheatley` | Wheatley-style nervous voice |
+
+## Korean Language Support
+
+Simi TTS supports Korean (한국어) with automatic language detection:
+
+```javascript
+const tts = new TTS({ voice: Voice.glados });
+
+// Korean text
+await tts.speak("안녕하세요. 애퍼처 사이언스에 오신 것을 환영합니다.");
+
+// Mixed Korean + English
+await tts.speak("Hello! 안녕하세요!");
+
+// Force language (optional)
+const phonemes = SimiTTS.textToPhonemes("안녕하세요", "ko");
+```
+
+### Korean Phoneme Conversion
+
+- Decomposes Hangul syllables into jamo (초성, 중성, 종성)
+- Maps to ARPAbet-like phonemes for synthesis
+- Handles 받침 (final consonants) correctly
 
 ## GLaDOS Voice
 
