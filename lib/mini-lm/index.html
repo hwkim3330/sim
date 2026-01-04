@@ -232,6 +232,44 @@
       color: var(--accent);
       text-decoration: none;
     }
+
+    .progress-bar {
+      height: 8px;
+      background: var(--bg-tertiary);
+      border-radius: 4px;
+      overflow: hidden;
+      margin: 15px 0;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--success));
+      width: 0%;
+      transition: width 0.3s;
+    }
+
+    .progress-text {
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: 0.9em;
+    }
+
+    .training-log {
+      max-height: 150px;
+      overflow-y: auto;
+      font-family: monospace;
+      font-size: 0.85em;
+      color: var(--text-secondary);
+      margin-top: 10px;
+    }
+
+    .training-log div {
+      padding: 3px 0;
+    }
+
+    .training-log .loss {
+      color: var(--accent);
+    }
   </style>
 </head>
 <body>
@@ -298,6 +336,30 @@
     </div>
 
     <div class="panel">
+      <h2>🎓 모델 학습</h2>
+      <div class="input-group">
+        <label>Epochs: <span id="epochs-value">20</span></label>
+        <div class="slider-group">
+          <span>5</span>
+          <input type="range" id="epochs" min="5" max="100" step="5" value="20">
+          <span>100</span>
+        </div>
+      </div>
+      <div class="controls">
+        <button id="train-btn">🚀 학습 시작</button>
+        <button id="save-btn" class="secondary" disabled>💾 저장</button>
+        <button id="load-btn" class="secondary">📂 불러오기</button>
+      </div>
+      <div class="training-progress" id="training-progress" style="display:none;">
+        <div class="progress-bar">
+          <div class="progress-fill" id="progress-fill"></div>
+        </div>
+        <div class="progress-text" id="progress-text">준비 중...</div>
+      </div>
+      <div class="training-log" id="training-log"></div>
+    </div>
+
+    <div class="panel">
       <h2>🔤 토큰화 테스트</h2>
       <div class="input-group">
         <label>텍스트 입력</label>
@@ -320,16 +382,20 @@
   </div>
 
   <script src="korean-mini-lm.js"></script>
+  <script src="trainer.js"></script>
   <script>
-    const { KoreanMiniLM, JamoTokenizer } = window.KoreanMiniLM;
+    const { JamoTokenizer } = window.KoreanMiniLM;
+    const { TrainableKoreanLM, KOREAN_CORPUS, augmentCorpus } = window.KoreanMiniLMTrainer;
 
-    // Initialize model
-    const model = new KoreanMiniLM({
-      embedDim: 128,
-      hiddenDim: 256
+    // Initialize trainable model (smaller for faster training in browser)
+    let model = new TrainableKoreanLM({
+      embedDim: 64,
+      hiddenDim: 128,
+      learningRate: 0.02
     });
 
     const tokenizer = new JamoTokenizer();
+    let trained = false;
 
     // Update model info
     const info = model.getInfo();
@@ -406,6 +472,97 @@
 
     // Initial tokenize
     tokenizeBtn.click();
+
+    // ========== Training ==========
+
+    const epochsSlider = document.getElementById('epochs');
+    const epochsValue = document.getElementById('epochs-value');
+    epochsSlider.addEventListener('input', () => {
+      epochsValue.textContent = epochsSlider.value;
+    });
+
+    const trainBtn = document.getElementById('train-btn');
+    const saveBtn = document.getElementById('save-btn');
+    const loadBtn = document.getElementById('load-btn');
+    const trainingProgress = document.getElementById('training-progress');
+    const progressFill = document.getElementById('progress-fill');
+    const progressText = document.getElementById('progress-text');
+    const trainingLog = document.getElementById('training-log');
+
+    trainBtn.addEventListener('click', async () => {
+      const epochs = parseInt(epochsSlider.value);
+
+      trainBtn.disabled = true;
+      trainingProgress.style.display = 'block';
+      trainingLog.innerHTML = '';
+      progressFill.style.width = '0%';
+
+      // Augment corpus
+      const corpus = augmentCorpus(KOREAN_CORPUS);
+      progressText.textContent = `학습 데이터: ${corpus.length}개 문장`;
+
+      await new Promise(r => setTimeout(r, 100));
+
+      try {
+        const history = await model.train(corpus, epochs, (info) => {
+          const pct = (info.epoch / info.total * 100).toFixed(0);
+          progressFill.style.width = pct + '%';
+          progressText.textContent = `Epoch ${info.epoch}/${info.total} - Loss: ${info.loss.toFixed(4)} - PPL: ${info.perplexity.toFixed(2)}`;
+
+          const logEntry = document.createElement('div');
+          logEntry.innerHTML = `Epoch ${info.epoch}: <span class="loss">Loss=${info.loss.toFixed(4)}</span> PPL=${info.perplexity.toFixed(2)}`;
+          trainingLog.appendChild(logEntry);
+          trainingLog.scrollTop = trainingLog.scrollHeight;
+        });
+
+        progressText.textContent = `✓ 학습 완료! 최종 Loss: ${history[history.length - 1].loss.toFixed(4)}`;
+        trained = true;
+        saveBtn.disabled = false;
+
+        // Update model info
+        document.getElementById('status').textContent = '✓ 모델 학습 완료';
+
+      } catch (err) {
+        progressText.textContent = '오류: ' + err.message;
+        console.error(err);
+      } finally {
+        trainBtn.disabled = false;
+      }
+    });
+
+    // Save model
+    saveBtn.addEventListener('click', () => {
+      const data = model.save();
+      const json = JSON.stringify(data);
+      const blob = new Blob([json], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'korean-mini-lm.json';
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    // Load model
+    loadBtn.addEventListener('click', () => {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = '.json';
+      input.onchange = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const text = await file.text();
+        const data = JSON.parse(text);
+        model.load(data);
+        trained = true;
+        saveBtn.disabled = false;
+
+        document.getElementById('status').textContent = '✓ 모델 로드 완료';
+        alert('모델을 불러왔습니다!');
+      };
+      input.click();
+    });
   </script>
 </body>
 </html>
