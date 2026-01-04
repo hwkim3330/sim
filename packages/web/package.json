@@ -1,0 +1,32 @@
+{
+  "name": "@simi/web",
+  "version": "1.0.0",
+  "description": "Simi Platform Web UI - Chat interface and demo",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "files": ["dist", "public"],
+  "scripts": {
+    "build": "node build.js",
+    "dev": "node build.js --watch",
+    "serve": "npx serve public -p 3000",
+    "clean": "rimraf dist"
+  },
+  "keywords": ["simi", "web", "ui", "chatbot", "korean"],
+  "author": "hwkim3330",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hwkim3330/sim.git",
+    "directory": "packages/web"
+  },
+  "devDependencies": {
+    "esbuild": "^0.19.10",
+    "rimraf": "^5.0.5",
+    "typescript": "^5.3.3",
+    "serve": "^14.2.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

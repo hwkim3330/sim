@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simi Chat Demo</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    #chat-container {
+      width: 100%;
+      max-width: 480px;
+      height: 600px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    .demo-info {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: white;
+      font-size: 14px;
+      opacity: 0.8;
+    }
+    .demo-info a {
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <div id="chat-container"></div>
+  <div class="demo-info">
+    Simi Platform Demo | <a href="https://github.com/hwkim3330/sim" target="_blank">GitHub</a>
+  </div>
+
+  <script src="../dist/simi-web.js"></script>
+  <script>
+    // Simple echo handler (replace with actual chat engine)
+    async function handleMessage(message) {
+      // Simulate network delay
+      await new Promise(r => setTimeout(r, 500));
+
+      // Simple responses
+      const lower = message.toLowerCase();
+      if (lower.includes('안녕')) return '안녕하세요! 심이예요~ ✨';
+      if (lower.includes('이름')) return '저는 심이라고 해요! 반가워요~';
+      if (lower.includes('뭐해')) return '당신이랑 대화하고 있죠! ㅎㅎ';
+      if (lower.includes('고마')) return '천만에요~ 💕';
+      if (lower.includes('슬퍼') || lower.includes('힘들')) return '힘드시겠어요... 제가 옆에 있을게요 ㅠㅠ';
+      if (lower.includes('ㅋㅋ') || lower.includes('ㅎㅎ')) return '헤헤 재밌죠? ㅎㅎ';
+
+      // Default responses
+      const defaults = [
+        '그렇군요!',
+        '오오 그래요?',
+        '재밌네요!',
+        '더 얘기해주세요~',
+        '네네, 듣고 있어요~'
+      ];
+      return defaults[Math.floor(Math.random() * defaults.length)];
+    }
+
+    // Initialize chat UI
+    const chat = SimiWeb.createChatUI({
+      container: '#chat-container',
+      name: '심이',
+      placeholder: '심이에게 말해보세요...',
+      onSend: handleMessage,
+      theme: 'light'
+    });
+
+    // Add welcome message
+    chat.addMessage('assistant', '안녕하세요! 저는 심이예요~ 무슨 얘기 할까요? ✨');
+  </script>
+</body>
+</html>

@@ -1,0 +1,42 @@
+{
+  "name": "@simi/chat",
+  "version": "1.0.0",
+  "description": "Simi Platform Chat - Conversational AI Engine",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./browser": {
+      "import": "./dist/browser.mjs",
+      "default": "./dist/browser.js"
+    }
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "node build.js",
+    "dev": "node build.js --watch",
+    "clean": "rimraf dist",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": ["simi", "chat", "chatbot", "intent", "emotion", "korean"],
+  "author": "hwkim3330",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hwkim3330/sim.git",
+    "directory": "packages/chat"
+  },
+  "devDependencies": {
+    "esbuild": "^0.19.10",
+    "rimraf": "^5.0.5",
+    "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
