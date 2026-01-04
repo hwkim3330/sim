@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Korean Mini LM - 한국어 미니 언어모델</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg-primary: #0a0a0a;
+      --bg-secondary: #1a1a1a;
+      --bg-tertiary: #252525;
+      --text-primary: #e0e0e0;
+      --text-secondary: #888;
+      --accent: #4a9eff;
+      --accent-dim: #2a7edf;
+      --success: #4caf50;
+    }
+
+    body {
+      font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    h1 {
+      font-size: 2.5em;
+      color: var(--accent);
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      color: var(--text-secondary);
+      font-size: 1.1em;
+    }
+
+    .panel {
+      background: var(--bg-secondary);
+      border-radius: 12px;
+      padding: 25px;
+      margin-bottom: 20px;
+    }
+
+    .panel h2 {
+      font-size: 1.2em;
+      margin-bottom: 15px;
+      color: var(--accent);
+    }
+
+    .model-info {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .info-card {
+      background: var(--bg-tertiary);
+      padding: 15px;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    .info-card .value {
+      font-size: 1.8em;
+      font-weight: bold;
+      color: var(--accent);
+    }
+
+    .info-card .label {
+      font-size: 0.85em;
+      color: var(--text-secondary);
+      margin-top: 5px;
+    }
+
+    .input-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--text-secondary);
+      font-size: 0.9em;
+    }
+
+    textarea, input[type="text"] {
+      width: 100%;
+      padding: 12px;
+      background: var(--bg-tertiary);
+      border: 1px solid #333;
+      border-radius: 8px;
+      color: var(--text-primary);
+      font-size: 1em;
+      font-family: inherit;
+      resize: vertical;
+    }
+
+    textarea {
+      min-height: 100px;
+    }
+
+    textarea:focus, input:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    button {
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 1em;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    button:hover {
+      background: var(--accent-dim);
+    }
+
+    button:disabled {
+      background: #444;
+      cursor: not-allowed;
+    }
+
+    button.secondary {
+      background: var(--bg-tertiary);
+      border: 1px solid #444;
+    }
+
+    .slider-group {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    input[type="range"] {
+      flex: 1;
+      height: 6px;
+      -webkit-appearance: none;
+      background: var(--bg-tertiary);
+      border-radius: 3px;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      background: var(--accent);
+      border-radius: 50%;
+      cursor: pointer;
+    }
+
+    .output {
+      background: var(--bg-tertiary);
+      padding: 20px;
+      border-radius: 8px;
+      min-height: 150px;
+      white-space: pre-wrap;
+      font-family: 'Noto Sans KR', monospace;
+      line-height: 1.8;
+    }
+
+    .output.generating {
+      border: 1px solid var(--accent);
+    }
+
+    .tokens-display {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-top: 15px;
+    }
+
+    .token {
+      background: var(--bg-tertiary);
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.85em;
+      font-family: monospace;
+    }
+
+    .token.special {
+      background: var(--accent-dim);
+      color: white;
+    }
+
+    .status {
+      text-align: center;
+      padding: 15px;
+      color: var(--text-secondary);
+    }
+
+    .status.ready {
+      color: var(--success);
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 40px;
+      color: var(--text-secondary);
+      font-size: 0.9em;
+    }
+
+    footer a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🇰🇷 Korean Mini LM</h1>
+      <p class="subtitle">자모 기반 한국어 언어모델 (Pure JavaScript)</p>
+    </header>
+
+    <div class="panel">
+      <h2>📊 모델 정보</h2>
+      <div class="model-info">
+        <div class="info-card">
+          <div class="value" id="vocab-size">-</div>
+          <div class="label">Vocabulary</div>
+        </div>
+        <div class="info-card">
+          <div class="value" id="param-count">-</div>
+          <div class="label">Parameters</div>
+        </div>
+        <div class="info-card">
+          <div class="value" id="model-size">-</div>
+          <div class="label">Model Size</div>
+        </div>
+        <div class="info-card">
+          <div class="value" id="architecture">-</div>
+          <div class="label">Architecture</div>
+        </div>
+      </div>
+      <div class="status" id="status">Loading...</div>
+    </div>
+
+    <div class="panel">
+      <h2>✍️ 텍스트 생성</h2>
+      <div class="input-group">
+        <label>프롬프트 (시작 텍스트)</label>
+        <input type="text" id="prompt" placeholder="안녕하세요" value="안녕">
+      </div>
+
+      <div class="input-group">
+        <label>Temperature: <span id="temp-value">0.8</span></label>
+        <div class="slider-group">
+          <span>0</span>
+          <input type="range" id="temperature" min="0" max="2" step="0.1" value="0.8">
+          <span>2</span>
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label>Max Length: <span id="length-value">50</span></label>
+        <div class="slider-group">
+          <span>10</span>
+          <input type="range" id="max-length" min="10" max="200" step="10" value="50">
+          <span>200</span>
+        </div>
+      </div>
+
+      <div class="controls">
+        <button id="generate-btn">🚀 생성하기</button>
+        <button id="random-btn" class="secondary">🎲 랜덤</button>
+      </div>
+
+      <div class="output" id="output">생성된 텍스트가 여기에 표시됩니다...</div>
+    </div>
+
+    <div class="panel">
+      <h2>🔤 토큰화 테스트</h2>
+      <div class="input-group">
+        <label>텍스트 입력</label>
+        <input type="text" id="tokenize-input" placeholder="한글을 입력하세요" value="안녕하세요">
+      </div>
+      <button id="tokenize-btn" class="secondary">토큰화</button>
+      <div class="tokens-display" id="tokens"></div>
+    </div>
+
+    <footer>
+      <p>
+        Korean Mini LM v1.0.0 |
+        <a href="https://github.com/hwkim3330/sim" target="_blank">GitHub</a> |
+        Pure JavaScript, No Dependencies
+      </p>
+      <p style="margin-top: 10px;">
+        Architecture: Embedding → GRU → Dense (Jamo-level)
+      </p>
+    </footer>
+  </div>
+
+  <script src="korean-mini-lm.js"></script>
+  <script>
+    const { KoreanMiniLM, JamoTokenizer } = window.KoreanMiniLM;
+
+    // Initialize model
+    const model = new KoreanMiniLM({
+      embedDim: 128,
+      hiddenDim: 256
+    });
+
+    const tokenizer = new JamoTokenizer();
+
+    // Update model info
+    const info = model.getInfo();
+    document.getElementById('vocab-size').textContent = info.vocabSize;
+    document.getElementById('param-count').textContent = (info.paramCount / 1000).toFixed(0) + 'K';
+    document.getElementById('model-size').textContent = info.sizeMB + ' MB';
+    document.getElementById('architecture').textContent = `${info.embedDim}→${info.hiddenDim}`;
+    document.getElementById('status').textContent = '✓ 모델 준비 완료';
+    document.getElementById('status').classList.add('ready');
+
+    // Temperature slider
+    const tempSlider = document.getElementById('temperature');
+    const tempValue = document.getElementById('temp-value');
+    tempSlider.addEventListener('input', () => {
+      tempValue.textContent = tempSlider.value;
+    });
+
+    // Length slider
+    const lengthSlider = document.getElementById('max-length');
+    const lengthValue = document.getElementById('length-value');
+    lengthSlider.addEventListener('input', () => {
+      lengthValue.textContent = lengthSlider.value;
+    });
+
+    // Generate button
+    const generateBtn = document.getElementById('generate-btn');
+    const output = document.getElementById('output');
+
+    generateBtn.addEventListener('click', () => {
+      const prompt = document.getElementById('prompt').value;
+      const temperature = parseFloat(tempSlider.value);
+      const maxLength = parseInt(lengthSlider.value);
+
+      generateBtn.disabled = true;
+      output.classList.add('generating');
+      output.textContent = '생성 중...';
+
+      setTimeout(() => {
+        try {
+          const result = model.generate(prompt, maxLength, temperature);
+          output.textContent = result;
+        } catch (err) {
+          output.textContent = '오류: ' + err.message;
+        } finally {
+          generateBtn.disabled = false;
+          output.classList.remove('generating');
+        }
+      }, 10);
+    });
+
+    // Random button
+    const randomBtn = document.getElementById('random-btn');
+    const prompts = ['안녕', '오늘', '나는', '우리', '사람', '세상', '하늘'];
+
+    randomBtn.addEventListener('click', () => {
+      document.getElementById('prompt').value = prompts[Math.floor(Math.random() * prompts.length)];
+      generateBtn.click();
+    });
+
+    // Tokenize button
+    const tokenizeBtn = document.getElementById('tokenize-btn');
+    const tokensDisplay = document.getElementById('tokens');
+
+    tokenizeBtn.addEventListener('click', () => {
+      const text = document.getElementById('tokenize-input').value;
+      const tokens = tokenizer.encode(text);
+
+      tokensDisplay.innerHTML = tokens.map(idx => {
+        const token = window.KoreanMiniLM.VOCAB[idx] || '?';
+        const isSpecial = ['<PAD>', '<UNK>', '<BOS>', '<EOS>'].includes(token);
+        return `<span class="token ${isSpecial ? 'special' : ''}">${token}</span>`;
+      }).join('');
+    });
+
+    // Initial tokenize
+    tokenizeBtn.click();
+  </script>
+</body>
+</html>
