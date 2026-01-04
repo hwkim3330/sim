@@ -124,6 +124,52 @@ bun run build
 - Bun 1.0+ or Node.js 18+
 - Anthropic API key
 
+## TTS (Text-to-Speech)
+
+Built-in Klatt formant synthesizer with English and Korean support:
+
+```typescript
+import { TTS, Voice } from 'simi-agent';
+
+// Create TTS instance
+const tts = new TTS({ voice: 'glados' });
+
+// Synthesize and save
+await tts.saveWav('Hello, world!', 'output.wav');
+
+// Korean support
+await tts.saveWav('안녕하세요', 'korean.wav');
+
+// Get phonemes (debugging)
+console.log(tts.getPhonemes('Hello'));
+// ['HH', 'AX', 'L', 'OW', 'SIL', 'PAU']
+```
+
+### Voice Presets
+
+| Voice | Description |
+|-------|-------------|
+| `default` | Neutral voice (120 Hz) |
+| `male` | Lower pitch (100 Hz) |
+| `female` | Higher pitch (180 Hz) |
+| `robot` | Monotone, flat |
+| `glados` | AI assistant style |
+
+### Custom Voice
+
+```typescript
+const tts = new TTS({
+  voice: {
+    name: 'custom',
+    pitch: 150,
+    pitchRange: 20,
+    speed: 1.0,
+    breathiness: 0.1,
+    roughness: 0,
+  }
+});
+```
+
 ## Credits
 
 - [klatt-syn](https://github.com/chdh/klatt-syn) - Klatt formant synthesizer
